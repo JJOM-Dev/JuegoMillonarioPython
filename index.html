@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Juego de Historia Universal</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <header class="hero">
+        <div>
+          <p class="hero__eyebrow">Juego Educativo</p>
+          <h1>Historia Universal</h1>
+          <p class="hero__subtitle">
+            Vive los períodos históricos con retos dinámicos, feedback inmediato y
+            progreso guardado.
+          </p>
+        </div>
+        <div class="hero__badge">
+          <span>Neumorphism UI</span>
+        </div>
+      </header>
+
+      <section class="layout">
+        <aside class="card menu">
+          <h2>Menú Principal</h2>
+          <button class="btn btn--primary" data-action="new">Nueva partida</button>
+          <button class="btn" data-action="resume">Cargar partida</button>
+          <button class="btn btn--ghost" data-action="scores">Puntajes</button>
+          <div class="menu__status" id="saveStatus">
+            No hay partida guardada.
+          </div>
+        </aside>
+
+        <main class="card game">
+          <div class="game__header">
+            <div>
+              <p class="game__period" id="periodLabel">Selecciona un período</p>
+              <h2 id="levelLabel">Nivel actual</h2>
+            </div>
+            <div class="game__stats">
+              <div>
+                <span>Vidas</span>
+                <strong id="lives">3</strong>
+              </div>
+              <div>
+                <span>Puntaje</span>
+                <strong id="score">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="question" id="questionCard">
+            <p class="question__text" id="questionText">
+              Selecciona una opción para comenzar el reto histórico.
+            </p>
+            <div class="question__options" id="options"></div>
+          </div>
+
+          <div class="feedback" id="feedback">
+            <span class="feedback__icon">🧭</span>
+            <p id="feedbackText">Elige un reto para iniciar.</p>
+          </div>
+        </main>
+      </section>
+
+      <section class="card timeline">
+        <h2>Períodos Disponibles</h2>
+        <div class="timeline__grid" id="periods"></div>
+      </section>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
