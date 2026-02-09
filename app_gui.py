@@ -702,7 +702,7 @@ class AplicacionJuego:
         self.pregunta_especial = False
         self.pregunta_actual: Pregunta | None = None
         self.temporizador_id: str | None = None
-        self.comodines = {"pista": 1, "saltar": 1, "investigar": 1}
+        self.comodines = {"pista": 1, "saltar": 1, "investigar": 1, "eliminar": 1}
         self.permitir_salida_hasta: float = 0.0
         self.dificultad = "normal"
         self.configuracion = self._obtener_configuracion("normal")
@@ -750,7 +750,7 @@ class AplicacionJuego:
                 "probabilidad_especial": 0,
                 "vidas_extra_especial": 0,
                 "anti_trampa": False,
-                "comodines": {"pista": 0, "saltar": 0, "investigar": 0},
+                "comodines": {"pista": 0, "saltar": 0, "investigar": 0, "eliminar": 0},
                 "puede_guardar": True,
             },
             "facil": {
@@ -760,7 +760,7 @@ class AplicacionJuego:
                 "probabilidad_especial": 0.1,
                 "vidas_extra_especial": 1,
                 "anti_trampa": True,
-                "comodines": {"pista": 0, "saltar": 2, "investigar": 2},
+                "comodines": {"pista": 2, "saltar": 2, "investigar": 2, "eliminar": 2},
                 "puede_guardar": True,
             },
             "normal": {
@@ -770,7 +770,7 @@ class AplicacionJuego:
                 "probabilidad_especial": 0.1,
                 "vidas_extra_especial": 1,
                 "anti_trampa": True,
-                "comodines": {"pista": 1, "saltar": 1, "investigar": 1},
+                "comodines": {"pista": 1, "saltar": 1, "investigar": 1, "eliminar": 1},
                 "puede_guardar": True,
             },
             "dificil": {
@@ -780,7 +780,7 @@ class AplicacionJuego:
                 "probabilidad_especial": 0.05,
                 "vidas_extra_especial": 1,
                 "anti_trampa": True,
-                "comodines": {"pista": 0, "saltar": 0, "investigar": 0},
+                "comodines": {"pista": 0, "saltar": 0, "investigar": 0, "eliminar": 0},
                 "puede_guardar": True,
             },
             "hardcore": {
@@ -790,7 +790,7 @@ class AplicacionJuego:
                 "probabilidad_especial": 0,
                 "vidas_extra_especial": 0,
                 "anti_trampa": True,
-                "comodines": {"pista": 0, "saltar": 0, "investigar": 0},
+                "comodines": {"pista": 0, "saltar": 0, "investigar": 0, "eliminar": 0},
                 "puede_guardar": False,
             },
         }
@@ -928,6 +928,12 @@ class AplicacionJuego:
             text="Comodín: Investigar 10s",
             style="BotonSecundario.TButton",
             command=self.usar_comodin_investigar,
+        ).pack(side="left", padx=4, pady=6)
+        ttk.Button(
+            self.panel_comodines,
+            text="Comodín: Eliminar 2",
+            style="BotonSecundario.TButton",
+            command=self.usar_comodin_eliminar,
         ).pack(side="left", padx=4, pady=6)
 
         self.lienzo_confeti = tk.Canvas(self.columna_juego, height=120, bg="#ffffff", highlightthickness=0)
@@ -1093,7 +1099,9 @@ class AplicacionJuego:
         self._actualizar_panel()
 
     def _actualizar_comodines(self) -> None:
-        for boton, cantidad in zip(self.panel_comodines.winfo_children(), self.comodines.values()):
+        orden = ["pista", "saltar", "investigar", "eliminar"]
+        for boton, clave in zip(self.panel_comodines.winfo_children(), orden):
+            cantidad = self.comodines.get(clave, 0)
             boton.configure(state="normal" if cantidad > 0 else "disabled")
 
     def usar_comodin_pista(self) -> None:
@@ -1120,6 +1128,21 @@ class AplicacionJuego:
         self.comodines["investigar"] -= 1
         self.permitir_salida_hasta = datetime.now().timestamp() + 10
         self.estado_guardado.config(text="Puedes salir 10 segundos para investigar.")
+        self._actualizar_comodines()
+        self._guardar_automatico()
+
+    def usar_comodin_eliminar(self) -> None:
+        if self.comodines["eliminar"] <= 0 or not self.pregunta_actual:
+            return
+        botones = list(self.marco_opciones.winfo_children())
+        incorrectos = [boton for boton in botones if boton.cget("text") != self.pregunta_actual.respuesta]
+        disponibles = [boton for boton in incorrectos if str(boton.cget("state")) != "disabled"]
+        if len(disponibles) < 2:
+            return
+        random.shuffle(disponibles)
+        for boton in disponibles[:2]:
+            boton.configure(state="disabled")
+        self.comodines["eliminar"] -= 1
         self._actualizar_comodines()
         self._guardar_automatico()
 
@@ -1258,7 +1281,7 @@ class AplicacionJuego:
         self.tiempo_limite = estado.get("tiempo_limite", 30)
         self.tiempo_restante = estado.get("tiempo_restante", 30)
         self.pregunta_especial = estado.get("pregunta_especial", False)
-        self.comodines = estado.get("comodines", {"pista": True, "saltar": True, "investigar": True})
+        self.comodines = estado.get("comodines", {"pista": 1, "saltar": 1, "investigar": 1, "eliminar": 1})
         if estado.get("dificultad"):
             self._aplicar_dificultad(estado["dificultad"], actualizar_selector=True)
         self.entrada_nombre.delete(0, tk.END)

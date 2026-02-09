@@ -5,6 +5,36 @@
 - **José Osorio** (C.I: 30.973.057)
 - **Nelson Carrillo** (C.I: 31.611.962)
 
+## ¿De qué va el juego?
+Juego de Historia Universal es un reto educativo tipo trivia en el que exploras períodos históricos y respondes preguntas de opción múltiple. Cada categoría representa una etapa de la historia y tu objetivo es completar sus preguntas con la mayor precisión posible, cuidando tu puntaje, el tiempo y tus vidas.
+
+## ¿Cómo se juega?
+1. **Elige una categoría**: selecciona el período histórico con el que quieres iniciar.
+2. **Responde preguntas**: cada pregunta tiene cuatro opciones, elige la correcta.
+3. **Administra tus vidas y tiempo**: si fallas pierdes vidas (según la dificultad). Si el tiempo se agota, también pierdes la pregunta.
+4. **Usa comodines estratégicamente**: te permiten obtener pistas, saltar preguntas, investigar por unos segundos o eliminar opciones.
+5. **Completa la categoría**: al responder todas las preguntas, puedes continuar con otra categoría.
+
+## Mecánicas principales
+- **Puntaje**: cada respuesta correcta suma puntos.
+- **Vidas**: los errores reducen vidas; en modos avanzados perder vidas puede terminar la ronda.
+- **Tiempo por pregunta**: el temporizador varía por dificultad.
+- **Preguntas especiales**: pueden aparecer con reglas de tiempo distintas y premios extra.
+- **Guardado**: en la interfaz web puedes guardar y cargar partidas (excepto en modo hardcore).
+
+## Dificultades
+- **Principiante**: sin límite de vidas y sin comodines.
+- **Fácil**: más vidas, tiempo cómodo y 2 usos por comodín.
+- **Normal**: balance entre reto y ayudas, 1 uso por comodín.
+- **Difícil**: menos margen de error, sin comodines y con preguntas extra avanzadas.
+- **Hardcore**: reglas más estrictas, sin comodines y errores reinician la ronda.
+
+## Comodines
+- **Pista**: muestra una pista basada en la respuesta.
+- **Saltar**: omite la pregunta actual.
+- **Investigar 10s**: te permite salir temporalmente sin penalización.
+- **Eliminar 2**: elimina dos opciones incorrectas para dejar solo dos respuestas visibles.
+
 ## Metodología del Proyecto
 Para el desarrollo del juego educativo sobre Historia Universal enfocado en Venezuela, se selecciona la **metodología en Cascada**, debido a su estructura secuencial, organizada y adecuada para proyectos con requisitos definidos desde el inicio.
 
