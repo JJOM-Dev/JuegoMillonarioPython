@@ -810,7 +810,8 @@ class AplicacionJuego:
             opciones = ["principiante", "facil", "normal", "dificil", "hardcore"]
             if nivel in opciones:
                 self.selector_dificultad.current(opciones.index(nivel))
-        self._actualizar_comodines()
+        if hasattr(self, "boton_pista"):
+            self._actualizar_comodines()
         self._actualizar_panel()
 
     def _cambiar_dificultad(self, _evento: tk.Event) -> None:
@@ -1107,6 +1108,8 @@ class AplicacionJuego:
         self._actualizar_panel()
 
     def _actualizar_comodines(self) -> None:
+        if not hasattr(self, "boton_pista"):
+            return
         botones = {
             "pista": self.boton_pista,
             "saltar": self.boton_saltar,
