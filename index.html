@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Juego de Historia Universal</title>
-    <link rel="stylesheet" href="styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -77,6 +76,623 @@
       </section>
     </div>
 
-    <script src="app.js"></script>
+    <style>
+      /* ===========================
+         Diseño neumórfico global
+         =========================== */
+      :root {
+        color-scheme: light;
+        --bg: #eef1f7;
+        --surface: #eef1f7;
+        --surface-raised: #f7f9ff;
+        --shadow-dark: #c8cedc;
+        --shadow-light: #ffffff;
+        --accent: #5f6bff;
+        --accent-soft: #dfe4ff;
+        --text: #1f2430;
+        --muted: #687080;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", sans-serif;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 32px;
+      }
+
+      .app {
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 28px 32px;
+        border-radius: 26px;
+        background: var(--surface);
+        box-shadow: 16px 16px 32px var(--shadow-dark), -16px -16px 32px var(--shadow-light);
+      }
+
+      .hero h1 {
+        font-size: clamp(2.2rem, 4vw, 3.2rem);
+        margin-bottom: 8px;
+      }
+
+      .hero__eyebrow {
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--muted);
+        font-size: 0.75rem;
+        margin-bottom: 6px;
+      }
+
+      .hero__subtitle {
+        color: var(--muted);
+        max-width: 480px;
+      }
+
+      .hero__badge {
+        background: var(--surface-raised);
+        padding: 18px 22px;
+        border-radius: 22px;
+        box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
+        font-weight: 600;
+        color: var(--accent);
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(220px, 280px) 1fr;
+        gap: 24px;
+      }
+
+      .card {
+        background: var(--surface);
+        border-radius: 26px;
+        padding: 24px;
+        box-shadow: 14px 14px 28px var(--shadow-dark), -14px -14px 28px var(--shadow-light);
+      }
+
+      .menu {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .menu h2 {
+        font-size: 1.3rem;
+      }
+
+      .menu__status {
+        margin-top: auto;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .btn {
+        border: none;
+        padding: 14px 18px;
+        border-radius: 16px;
+        background: var(--surface);
+        box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--text);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+      }
+
+      .btn--primary {
+        background: var(--accent);
+        color: white;
+        box-shadow: 8px 8px 16px rgba(95, 107, 255, 0.35), -8px -8px 16px var(--shadow-light);
+      }
+
+      .btn--ghost {
+        background: var(--surface-raised);
+      }
+
+      .game {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .game__header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .game__period {
+        color: var(--muted);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .game__stats {
+        display: flex;
+        gap: 20px;
+        font-size: 0.9rem;
+      }
+
+      .game__stats div {
+        background: var(--surface-raised);
+        padding: 10px 14px;
+        border-radius: 14px;
+        box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
+        text-align: center;
+        min-width: 90px;
+      }
+
+      .question {
+        background: var(--surface-raised);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: inset 8px 8px 16px var(--shadow-dark), inset -8px -8px 16px var(--shadow-light);
+      }
+
+      .question__text {
+        font-size: 1.05rem;
+        margin-bottom: 18px;
+      }
+
+      .question__options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      }
+
+      .option {
+        padding: 12px 16px;
+        border-radius: 14px;
+        background: var(--surface);
+        box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 600;
+        text-align: left;
+      }
+
+      .option:hover {
+        transform: translateY(-2px);
+      }
+
+      .option--correct {
+        background: #d7f5df;
+        color: #1c6b37;
+      }
+
+      .option--wrong {
+        background: #ffe0e0;
+        color: #8a2222;
+      }
+
+      .feedback {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 18px;
+        background: var(--surface);
+        box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+      }
+
+      .feedback__icon {
+        font-size: 1.4rem;
+      }
+
+      .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .timeline__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 16px;
+      }
+
+      .period {
+        padding: 16px;
+        border-radius: 18px;
+        background: var(--surface);
+        box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .period span {
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      @media (max-width: 900px) {
+        body {
+          padding: 20px;
+        }
+
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .hero {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 16px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .hero {
+          padding: 22px;
+        }
+
+        .card {
+          padding: 20px;
+        }
+      }
+    </style>
+    </style>
+    <script>
+      /*
+        ============================================================
+        Juego de Historia Universal (versión web)
+        ------------------------------------------------------------
+        - Todo el código vive en este archivo para facilitar el fork.
+        - Variables y funciones están en español para ser legibles.
+        ============================================================
+      */
+
+      // Clave del almacenamiento local para guardar progreso.
+      const CLAVE_GUARDADO = "historia-save";
+
+      // Estado principal del juego (periodos, vidas, puntaje, etc.).
+      const estado = {
+        periodos: [
+          {
+            nombre: "Antigüedad",
+            descripcion: "Civilizaciones iniciales y aportes culturales.",
+            nivel: {
+              nombre: "Civilizaciones Iniciales",
+              preguntas: [
+                {
+                  enunciado: "¿Cuál de estas civilizaciones se desarrolló junto al río Nilo?",
+                  opciones: ["Mesopotamia", "Egipto", "China", "Grecia"],
+                  respuesta: "Egipto",
+                  retroalimentacion: "Egipto se consolidó gracias a las crecidas del Nilo.",
+                },
+                {
+                  enunciado: "¿Qué invento permitió registrar leyes y comercio?",
+                  opciones: ["La escritura", "La brújula", "La pólvora", "La rueda"],
+                  respuesta: "La escritura",
+                  retroalimentacion: "La escritura impulsó la organización social.",
+                },
+                {
+                  enunciado: "¿En qué región surgió la civilización mesopotámica?",
+                  opciones: [
+                    "Entre los ríos Tigris y Éufrates",
+                    "En los Andes",
+                    "En el Sahara",
+                    "En la península Ibérica",
+                  ],
+                  respuesta: "Entre los ríos Tigris y Éufrates",
+                  retroalimentacion: "Mesopotamia significa literalmente \"entre ríos\".",
+                },
+                {
+                  enunciado: "¿Qué pueblo destacó por el comercio marítimo en el Mediterráneo?",
+                  opciones: ["Fenicios", "Mayas", "Aztecas", "Incas"],
+                  respuesta: "Fenicios",
+                  retroalimentacion: "Los fenicios fueron grandes navegantes y comerciantes.",
+                },
+                {
+                  enunciado: "¿Qué sistema político se desarrolló en Atenas?",
+                  opciones: ["Democracia", "Feudalismo", "Monarquía absoluta", "Teocracia"],
+                  respuesta: "Democracia",
+                  retroalimentacion: "Atenas es recordada por la democracia directa.",
+                },
+                {
+                  enunciado: "¿Qué imperio construyó la Vía Apia y otras calzadas famosas?",
+                  opciones: ["Imperio Romano", "Imperio Persa", "Imperio Chino", "Imperio Otomano"],
+                  respuesta: "Imperio Romano",
+                  retroalimentacion: "Roma expandió su red de calzadas para unir el imperio.",
+                },
+                {
+                  enunciado: "¿Cuál fue uno de los aportes científicos de los griegos?",
+                  opciones: ["Geometría", "Imprenta", "Electricidad", "Motor de combustión"],
+                  respuesta: "Geometría",
+                  retroalimentacion: "Euclides y otros griegos sistematizaron la geometría.",
+                },
+                {
+                  enunciado: "¿Qué río fue clave para la civilización del Indo?",
+                  opciones: ["Indo", "Amazonas", "Danubio", "Nilo"],
+                  respuesta: "Indo",
+                  retroalimentacion: "La civilización del Indo prosperó junto a ese río.",
+                },
+                {
+                  enunciado: "¿Qué imperio inició la construcción de la Gran Muralla?",
+                  opciones: ["China", "Roma", "Persia", "Egipto"],
+                  respuesta: "China",
+                  retroalimentacion: "La Gran Muralla fue construida por dinastías chinas.",
+                },
+                {
+                  enunciado: "¿Cuál fue la capital del Imperio Bizantino?",
+                  opciones: ["Constantinopla", "Roma", "Atenas", "Alejandría"],
+                  respuesta: "Constantinopla",
+                  retroalimentacion: "Constantinopla fue el centro del Imperio Bizantino.",
+                },
+              ],
+            },
+          },
+          {
+            nombre: "Independencia y Venezuela",
+            descripcion: "Campañas libertadoras y liderazgos clave.",
+            nivel: {
+              nombre: "Campañas Libertadoras",
+              preguntas: [
+                {
+                  enunciado: "¿Quién lideró la Campaña Admirable en 1813?",
+                  opciones: [
+                    "Simón Bolívar",
+                    "Francisco Miranda",
+                    "José de San Martín",
+                    "Antonio José de Sucre",
+                  ],
+                  respuesta: "Simón Bolívar",
+                  retroalimentacion: "La Campaña Admirable consolidó el liderazgo de Bolívar.",
+                },
+                {
+                  enunciado: "¿Qué batalla aseguró la independencia de Venezuela en 1821?",
+                  opciones: ["Carabobo", "Boyacá", "Junín", "Pichincha"],
+                  respuesta: "Carabobo",
+                  retroalimentacion: "Carabobo fue decisiva para la independencia venezolana.",
+                },
+                {
+                  enunciado: "¿Qué figura es conocida como la Libertadora del Libertador?",
+                  opciones: ["Manuela Sáenz", "Luisa Cáceres", "Juana Ramírez", "Josefa Camejo"],
+                  respuesta: "Manuela Sáenz",
+                  retroalimentacion: "Manuela Sáenz apoyó a Bolívar en momentos clave.",
+                },
+                {
+                  enunciado: "¿En qué ciudad se firmó el Acta de Independencia de Venezuela en 1811?",
+                  opciones: ["Caracas", "Valencia", "Maracaibo", "Cumaná"],
+                  respuesta: "Caracas",
+                  retroalimentacion: "El Acta se firmó en Caracas el 5 de julio de 1811.",
+                },
+                {
+                  enunciado: "¿Qué batalla lideró Antonio José de Sucre que aseguró la independencia de Ecuador?",
+                  opciones: ["Pichincha", "Junín", "Ayacucho", "Carabobo"],
+                  respuesta: "Pichincha",
+                  retroalimentacion: "La victoria de Pichincha fue clave en 1822.",
+                },
+                {
+                  enunciado: "¿Qué documento proclamó los derechos del hombre y del ciudadano en 1789?",
+                  opciones: [
+                    "Declaración de los Derechos del Hombre y del Ciudadano",
+                    "Carta Magna",
+                    "Constitución de Cádiz",
+                    "Edicto de Nantes",
+                  ],
+                  respuesta: "Declaración de los Derechos del Hombre y del Ciudadano",
+                  retroalimentacion: "Fue un texto fundamental de la Revolución Francesa.",
+                },
+                {
+                  enunciado: "¿Quién encabezó el proceso de independencia de Haití?",
+                  opciones: ["Toussaint Louverture", "Simón Bolívar", "Napoleón Bonaparte", "Bernardo O'Higgins"],
+                  respuesta: "Toussaint Louverture",
+                  retroalimentacion: "Louverture fue líder de la revolución haitiana.",
+                },
+                {
+                  enunciado: "¿Qué país lideró la Revolución Industrial?",
+                  opciones: ["Inglaterra", "España", "Portugal", "Rusia"],
+                  respuesta: "Inglaterra",
+                  retroalimentacion: "La Revolución Industrial inició en Inglaterra.",
+                },
+                {
+                  enunciado: "¿Qué conflicto inició en 1914 y se conoce como la Primera Guerra Mundial?",
+                  opciones: ["Gran Guerra", "Guerra de Crimea", "Guerra Fría", "Guerra de los Cien Años"],
+                  respuesta: "Gran Guerra",
+                  retroalimentacion: "La Primera Guerra Mundial también se llamó Gran Guerra.",
+                },
+                {
+                  enunciado: "¿Qué organización internacional surgió tras la Segunda Guerra Mundial?",
+                  opciones: ["ONU", "OTAN", "Unión Europea", "Liga Hanseática"],
+                  respuesta: "ONU",
+                  retroalimentacion: "La ONU se fundó en 1945 para promover la paz.",
+                },
+              ],
+            },
+          },
+        ],
+        indicePeriodoActual: 0,
+        indicePreguntaActual: 0,
+        vidas: 3,
+        puntaje: 0,
+      };
+
+      // Referencias a elementos del DOM para actualizar la interfaz.
+      let contenedorPeriodos;
+      let etiquetaPeriodo;
+      let etiquetaNivel;
+      let etiquetaVidas;
+      let etiquetaPuntaje;
+      let textoPregunta;
+      let contenedorOpciones;
+      let textoFeedback;
+      let estadoGuardado;
+
+      // Renderiza las tarjetas de periodos disponibles.
+      function renderizarPeriodos() {
+        contenedorPeriodos.innerHTML = "";
+        estado.periodos.forEach((periodo, indice) => {
+          const tarjeta = document.createElement("button");
+          tarjeta.className = "period";
+          tarjeta.innerHTML = `<strong>${periodo.nombre}</strong><span>${periodo.descripcion}</span>`;
+          tarjeta.addEventListener("click", () => {
+            estado.indicePeriodoActual = indice;
+            estado.indicePreguntaActual = 0;
+            estado.vidas = 3;
+            estado.puntaje = 0;
+            actualizarJuego();
+          });
+          contenedorPeriodos.appendChild(tarjeta);
+        });
+      }
+
+      // Actualiza los indicadores de vidas, puntaje y nivel.
+      function actualizarEstado() {
+        etiquetaVidas.textContent = estado.vidas;
+        etiquetaPuntaje.textContent = estado.puntaje;
+        const periodo = estado.periodos[estado.indicePeriodoActual];
+        etiquetaPeriodo.textContent = periodo.nombre;
+        etiquetaNivel.textContent = periodo.nivel.nombre;
+      }
+
+      // Muestra la pregunta actual y sus opciones.
+      function actualizarPregunta() {
+        const periodo = estado.periodos[estado.indicePeriodoActual];
+        const pregunta = periodo.nivel.preguntas[estado.indicePreguntaActual];
+        if (!pregunta) {
+          textoPregunta.textContent = "¡Nivel completado!";
+          contenedorOpciones.innerHTML = "";
+          textoFeedback.textContent = "Felicidades, desbloqueaste el siguiente reto.";
+          guardarPartida();
+          return;
+        }
+        textoPregunta.textContent = pregunta.enunciado;
+        contenedorOpciones.innerHTML = "";
+        pregunta.opciones.forEach((opcion) => {
+          const boton = document.createElement("button");
+          boton.className = "option";
+          boton.textContent = opcion;
+          boton.addEventListener("click", () => manejarRespuesta(opcion, pregunta, boton));
+          contenedorOpciones.appendChild(boton);
+        });
+        textoFeedback.textContent = "Selecciona la opción correcta.";
+      }
+
+      // Evalúa la respuesta del jugador y actualiza vidas/puntaje.
+      function manejarRespuesta(opcionSeleccionada, pregunta, boton) {
+        const esCorrecta = opcionSeleccionada === pregunta.respuesta;
+        if (esCorrecta) {
+          estado.puntaje += 10;
+          boton.classList.add("option--correct");
+          textoFeedback.textContent = `✅ ${pregunta.retroalimentacion}`;
+        } else {
+          estado.vidas -= 1;
+          boton.classList.add("option--wrong");
+          textoFeedback.textContent = `❌ ${pregunta.retroalimentacion} Te quedan ${estado.vidas} vidas.`;
+        }
+        actualizarEstado();
+        if (estado.vidas <= 0) {
+          textoPregunta.textContent = "Perdiste las vidas.";
+          contenedorOpciones.innerHTML = "";
+          textoFeedback.textContent = "El personaje está triste, pero puedes intentarlo de nuevo.";
+          guardarPartida();
+          return;
+        }
+        setTimeout(() => {
+          estado.indicePreguntaActual += 1;
+          actualizarPregunta();
+        }, 700);
+      }
+
+      // Agrupa actualizaciones de estado y preguntas.
+      function actualizarJuego() {
+        actualizarEstado();
+        actualizarPregunta();
+      }
+
+      // Guarda el progreso en el navegador.
+      function guardarPartida() {
+        const datos = {
+          indicePeriodoActual: estado.indicePeriodoActual,
+          indicePreguntaActual: estado.indicePreguntaActual,
+          vidas: estado.vidas,
+          puntaje: estado.puntaje,
+        };
+        localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(datos));
+        estadoGuardado.textContent = "Partida guardada correctamente.";
+      }
+
+      // Carga la partida si existe en el navegador.
+      function cargarPartida() {
+        const guardado = localStorage.getItem(CLAVE_GUARDADO);
+        if (!guardado) {
+          estadoGuardado.textContent = "No hay partida guardada.";
+          return false;
+        }
+        const datos = JSON.parse(guardado);
+        estado.indicePeriodoActual = datos.indicePeriodoActual ?? 0;
+        estado.indicePreguntaActual = datos.indicePreguntaActual ?? 0;
+        estado.vidas = datos.vidas ?? 3;
+        estado.puntaje = datos.puntaje ?? 0;
+        estadoGuardado.textContent = "Partida cargada.";
+        return true;
+      }
+
+      // Asigna acciones a los botones del menú principal.
+      function enlazarMenu() {
+        document.querySelectorAll("[data-action]").forEach((boton) => {
+          boton.addEventListener("click", () => {
+            const accion = boton.dataset.action;
+            if (accion === "new") {
+              estado.indicePreguntaActual = 0;
+              estado.vidas = 3;
+              estado.puntaje = 0;
+              actualizarJuego();
+              estadoGuardado.textContent = "Nueva partida iniciada.";
+            }
+            if (accion === "resume") {
+              if (cargarPartida()) {
+                actualizarJuego();
+              }
+            }
+            if (accion === "scores") {
+              estadoGuardado.textContent = `Puntaje actual: ${estado.puntaje}`;
+            }
+          });
+        });
+      }
+
+      // Inicio: renderiza periodos, enlaza el menú y pinta la primera vista.
+      document.addEventListener("DOMContentLoaded", () => {
+        contenedorPeriodos = document.getElementById("periods");
+        etiquetaPeriodo = document.getElementById("periodLabel");
+        etiquetaNivel = document.getElementById("levelLabel");
+        etiquetaVidas = document.getElementById("lives");
+        etiquetaPuntaje = document.getElementById("score");
+        textoPregunta = document.getElementById("questionText");
+        contenedorOpciones = document.getElementById("options");
+        textoFeedback = document.getElementById("feedbackText");
+        estadoGuardado = document.getElementById("saveStatus");
+
+        renderizarPeriodos();
+        enlazarMenu();
+        actualizarJuego();
+      });
+    </script>
   </body>
 </html>

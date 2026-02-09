@@ -122,7 +122,7 @@ python main.py
 El juego guardará tu progreso en `savegame.json`.
 
 ## Interfaz web
-Para una interfaz moderna, responsive y con estilo Neumorphism puedes abrir el archivo `index.html` en tu navegador.
+Para una interfaz moderna, responsive y con estilo Neumorphism puedes abrir el archivo `index.html` en tu navegador. Toda la interfaz (HTML + CSS + JavaScript) está integrada en un solo archivo para que sea fácil de leer, explicar y modificar.
 
 ```bash
 # Opción simple

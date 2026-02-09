@@ -1,100 +1,209 @@
+"""Juego de Historia Universal (consola).
+
+Este archivo mantiene un flujo sencillo para practicar Historia Universal
+con preguntas de selección múltiple, sistema de vidas y puntaje.
+"""
+
 import json
 from dataclasses import dataclass
 from pathlib import Path
 
-SAVE_FILE = Path("savegame.json")
+ARCHIVO_GUARDADO = Path("savegame.json")
 
 
 @dataclass
-class Question:
-    prompt: str
-    options: list[str]
-    answer: str
-    feedback: str
+class Pregunta:
+    enunciado: str
+    opciones: list[str]
+    respuesta: str
+    retroalimentacion: str
 
 
 @dataclass
-class Level:
-    name: str
-    questions: list[Question]
+class Nivel:
+    nombre: str
+    preguntas: list[Pregunta]
 
 
 @dataclass
-class Period:
-    name: str
-    levels: list[Level]
+class Periodo:
+    nombre: str
+    niveles: list[Nivel]
 
 
-def build_periods() -> list[Period]:
+def construir_periodos() -> list[Periodo]:
+    """Crea los periodos históricos con sus niveles y preguntas."""
     return [
-        Period(
-            name="Antigüedad",
-            levels=[
-                Level(
-                    name="Civilizaciones Iniciales",
-                    questions=[
-                        Question(
-                            prompt="¿Cuál de estas civilizaciones se desarrolló junto al río Nilo?",
-                            options=["Mesopotamia", "Egipto", "China", "Grecia"],
-                            answer="Egipto",
-                            feedback="Egipto se consolidó gracias a las crecidas del río Nilo.",
+        Periodo(
+            nombre="Antigüedad",
+            niveles=[
+                Nivel(
+                    nombre="Civilizaciones Iniciales",
+                    preguntas=[
+                        Pregunta(
+                            enunciado="¿Cuál de estas civilizaciones se desarrolló junto al río Nilo?",
+                            opciones=["Mesopotamia", "Egipto", "China", "Grecia"],
+                            respuesta="Egipto",
+                            retroalimentacion="Egipto se consolidó gracias a las crecidas del río Nilo.",
                         ),
-                        Question(
-                            prompt="¿Qué invento es clave en el surgimiento de las ciudades antiguas?",
-                            options=["La pólvora", "La escritura", "El motor a vapor", "Internet"],
-                            answer="La escritura",
-                            feedback="La escritura permitió registrar leyes y transacciones.",
+                        Pregunta(
+                            enunciado="¿Qué invento es clave en el surgimiento de las ciudades antiguas?",
+                            opciones=["La pólvora", "La escritura", "El motor a vapor", "Internet"],
+                            respuesta="La escritura",
+                            retroalimentacion="La escritura permitió registrar leyes y transacciones.",
                         ),
-                        Question(
-                            prompt="¿En qué región surgió la civilización mesopotámica?",
-                            options=["Entre los ríos Tigris y Éufrates", "En los Andes", "En la península Ibérica", "En el Sahara"],
-                            answer="Entre los ríos Tigris y Éufrates",
-                            feedback="Mesopotamia significa ""entre ríos"".",
+                        Pregunta(
+                            enunciado="¿En qué región surgió la civilización mesopotámica?",
+                            opciones=[
+                                "Entre los ríos Tigris y Éufrates",
+                                "En los Andes",
+                                "En la península Ibérica",
+                                "En el Sahara",
+                            ],
+                            respuesta="Entre los ríos Tigris y Éufrates",
+                            retroalimentacion="Mesopotamia significa ""entre ríos"".",
                         ),
-                        Question(
-                            prompt="¿Qué cultura aportó el concepto de democracia directa?",
-                            options=["Roma", "Grecia", "Fenicia", "Persia"],
-                            answer="Grecia",
-                            feedback="Atenas es recordada por su democracia directa.",
+                        Pregunta(
+                            enunciado="¿Qué cultura aportó el concepto de democracia directa?",
+                            opciones=["Roma", "Grecia", "Fenicia", "Persia"],
+                            respuesta="Grecia",
+                            retroalimentacion="Atenas es recordada por su democracia directa.",
+                        ),
+                        Pregunta(
+                            enunciado="¿Qué pueblo destacó por el comercio marítimo en el Mediterráneo?",
+                            opciones=["Fenicios", "Mayas", "Aztecas", "Incas"],
+                            respuesta="Fenicios",
+                            retroalimentacion="Los fenicios fueron grandes navegantes y comerciantes.",
+                        ),
+                        Pregunta(
+                            enunciado="¿Qué imperio construyó la Vía Apia y otras calzadas famosas?",
+                            opciones=[
+                                "Imperio Romano",
+                                "Imperio Persa",
+                                "Imperio Chino",
+                                "Imperio Otomano",
+                            ],
+                            respuesta="Imperio Romano",
+                            retroalimentacion="Roma expandió su red de calzadas para unir el imperio.",
+                        ),
+                        Pregunta(
+                            enunciado="¿Cuál fue un aporte científico de los griegos antiguos?",
+                            opciones=["Geometría", "Imprenta", "Electricidad", "Motor de combustión"],
+                            respuesta="Geometría",
+                            retroalimentacion="Euclides y otros griegos sistematizaron la geometría.",
+                        ),
+                        Pregunta(
+                            enunciado="¿Qué estructura monumental se construyó en Egipto como tumbas reales?",
+                            opciones=["Pirámides", "Zigurats", "Anfiteatros", "Catedrales"],
+                            respuesta="Pirámides",
+                            retroalimentacion="Las pirámides eran tumbas para los faraones.",
+                        ),
+                        Pregunta(
+                            enunciado="¿Qué código legal es uno de los más antiguos de la historia?",
+                            opciones=["Código de Hammurabi", "Código Napoleónico", "Leyes de Indias", "Fuero Juzgo"],
+                            respuesta="Código de Hammurabi",
+                            retroalimentacion="El código de Hammurabi pertenece a Babilonia.",
+                        ),
+                        Pregunta(
+                            enunciado="¿Qué invento chino revolucionó la navegación en la antigüedad?",
+                            opciones=["Brújula", "Telescopio", "Imprenta", "Motor a vapor"],
+                            respuesta="Brújula",
+                            retroalimentacion="La brújula permitió viajes marítimos más precisos.",
                         ),
                     ],
                 ),
             ],
         ),
-        Period(
-            name="Independencia y Venezuela",
-            levels=[
-                Level(
-                    name="Campañas Libertadoras",
-                    questions=[
-                        Question(
-                            prompt="¿Quién lideró la Campaña Admirable en 1813?",
-                            options=["Simón Bolívar", "José de San Martín", "Francisco Miranda", "Antonio José de Sucre"],
-                            answer="Simón Bolívar",
-                            feedback="La Campaña Admirable consolidó el liderazgo de Bolívar.",
+        Periodo(
+            nombre="Independencia y Venezuela",
+            niveles=[
+                Nivel(
+                    nombre="Campañas Libertadoras",
+                    preguntas=[
+                        Pregunta(
+                            enunciado="¿Quién lideró la Campaña Admirable en 1813?",
+                            opciones=[
+                                "Simón Bolívar",
+                                "José de San Martín",
+                                "Francisco Miranda",
+                                "Antonio José de Sucre",
+                            ],
+                            respuesta="Simón Bolívar",
+                            retroalimentacion="La Campaña Admirable consolidó el liderazgo de Bolívar.",
                         ),
-                        Question(
-                            prompt="¿Qué batalla aseguró la independencia de Venezuela en 1821?",
-                            options=["Carabobo", "Boyacá", "Junín", "Pichincha"],
-                            answer="Carabobo",
-                            feedback="Carabobo fue decisiva para la independencia venezolana.",
+                        Pregunta(
+                            enunciado="¿Qué batalla aseguró la independencia de Venezuela en 1821?",
+                            opciones=["Carabobo", "Boyacá", "Junín", "Pichincha"],
+                            respuesta="Carabobo",
+                            retroalimentacion="Carabobo fue decisiva para la independencia venezolana.",
                         ),
-                        Question(
-                            prompt="¿Cuál era el objetivo principal del Congreso de Angostura?",
-                            options=[
+                        Pregunta(
+                            enunciado="¿Cuál era el objetivo principal del Congreso de Angostura?",
+                            opciones=[
                                 "Crear un gobierno central para la Gran Colombia",
                                 "Restaurar la monarquía española",
                                 "Dividir el territorio en virreinatos",
                                 "Declarar la guerra a Portugal",
                             ],
-                            answer="Crear un gobierno central para la Gran Colombia",
-                            feedback="El Congreso de Angostura sentó bases institucionales.",
+                            respuesta="Crear un gobierno central para la Gran Colombia",
+                            retroalimentacion="El Congreso de Angostura sentó bases institucionales.",
                         ),
-                        Question(
-                            prompt="¿Qué figura es conocida como la Libertadora del Libertador?",
-                            options=["Manuela Sáenz", "Luisa Cáceres", "Juana Ramírez", "Josefa Camejo"],
-                            answer="Manuela Sáenz",
-                            feedback="Manuela Sáenz apoyó a Bolívar en momentos clave.",
+                        Pregunta(
+                            enunciado="¿Qué figura es conocida como la Libertadora del Libertador?",
+                            opciones=[
+                                "Manuela Sáenz",
+                                "Luisa Cáceres",
+                                "Juana Ramírez",
+                                "Josefa Camejo",
+                            ],
+                            respuesta="Manuela Sáenz",
+                            retroalimentacion="Manuela Sáenz apoyó a Bolívar en momentos clave.",
+                        ),
+                        Pregunta(
+                            enunciado="¿En qué ciudad se firmó el Acta de Independencia de Venezuela en 1811?",
+                            opciones=["Caracas", "Valencia", "Maracaibo", "Cumaná"],
+                            respuesta="Caracas",
+                            retroalimentacion="El Acta se firmó en Caracas el 5 de julio de 1811.",
+                        ),
+                        Pregunta(
+                            enunciado="¿Qué batalla aseguró la independencia de Ecuador en 1822?",
+                            opciones=["Pichincha", "Junín", "Ayacucho", "Boyacá"],
+                            respuesta="Pichincha",
+                            retroalimentacion="La victoria de Pichincha fue clave para Ecuador.",
+                        ),
+                        Pregunta(
+                            enunciado="¿Qué documento proclamó los derechos del hombre y del ciudadano en 1789?",
+                            opciones=[
+                                "Declaración de los Derechos del Hombre y del Ciudadano",
+                                "Carta Magna",
+                                "Constitución de Cádiz",
+                                "Edicto de Nantes",
+                            ],
+                            respuesta="Declaración de los Derechos del Hombre y del Ciudadano",
+                            retroalimentacion="Fue un texto fundamental de la Revolución Francesa.",
+                        ),
+                        Pregunta(
+                            enunciado="¿Quién encabezó el proceso de independencia de Haití?",
+                            opciones=[
+                                "Toussaint Louverture",
+                                "Simón Bolívar",
+                                "Napoleón Bonaparte",
+                                "Bernardo O'Higgins",
+                            ],
+                            respuesta="Toussaint Louverture",
+                            retroalimentacion="Louverture fue líder de la revolución haitiana.",
+                        ),
+                        Pregunta(
+                            enunciado="¿Qué país lideró la Revolución Industrial?",
+                            opciones=["Inglaterra", "España", "Portugal", "Rusia"],
+                            respuesta="Inglaterra",
+                            retroalimentacion="La Revolución Industrial inició en Inglaterra.",
+                        ),
+                        Pregunta(
+                            enunciado="¿Qué organización internacional surgió tras la Segunda Guerra Mundial?",
+                            opciones=["ONU", "OTAN", "Unión Europea", "Liga Hanseática"],
+                            respuesta="ONU",
+                            retroalimentacion="La ONU se fundó en 1945 para promover la paz.",
                         ),
                     ],
                 ),
@@ -103,106 +212,110 @@ def build_periods() -> list[Period]:
     ]
 
 
-def choose_option(prompt: str, options: list[str]) -> int:
+def elegir_opcion(pregunta: str, opciones: list[str]) -> int:
+    """Solicita una opción válida al usuario y devuelve el índice seleccionado."""
     while True:
-        print(f"\n{prompt}")
-        for idx, option in enumerate(options, start=1):
-            print(f"  {idx}. {option}")
-        choice = input("Selecciona una opción: ").strip()
-        if choice.isdigit() and 1 <= int(choice) <= len(options):
-            return int(choice) - 1
+        print(f"\n{pregunta}")
+        for indice, opcion in enumerate(opciones, start=1):
+            print(f"  {indice}. {opcion}")
+        eleccion = input("Selecciona una opción: ").strip()
+        if eleccion.isdigit() and 1 <= int(eleccion) <= len(opciones):
+            return int(eleccion) - 1
         print("Opción inválida. Intenta nuevamente.")
 
 
-def load_game() -> dict | None:
-    if not SAVE_FILE.exists():
+def cargar_partida() -> dict | None:
+    """Lee la partida guardada si existe."""
+    if not ARCHIVO_GUARDADO.exists():
         return None
-    with SAVE_FILE.open("r", encoding="utf-8") as file_handle:
-        return json.load(file_handle)
+    with ARCHIVO_GUARDADO.open("r", encoding="utf-8") as archivo:
+        return json.load(archivo)
 
 
-def save_game(period_index: int, level_index: int, score: int) -> None:
-    data = {
-        "period_index": period_index,
-        "level_index": level_index,
-        "score": score,
+def guardar_partida(indice_periodo: int, indice_nivel: int, puntaje: int) -> None:
+    """Guarda el estado actual del juego."""
+    datos = {
+        "period_index": indice_periodo,
+        "level_index": indice_nivel,
+        "score": puntaje,
     }
-    with SAVE_FILE.open("w", encoding="utf-8") as file_handle:
-        json.dump(data, file_handle, indent=2, ensure_ascii=False)
+    with ARCHIVO_GUARDADO.open("w", encoding="utf-8") as archivo:
+        json.dump(datos, archivo, indent=2, ensure_ascii=False)
 
 
-def play_level(level: Level) -> int:
-    lives = 3
-    score = 0
-    print(f"\nIniciando nivel: {level.name}")
-    for question in level.questions:
-        if lives == 0:
+def jugar_nivel(nivel: Nivel) -> int:
+    """Ejecuta las preguntas de un nivel y retorna el puntaje obtenido."""
+    vidas = 3
+    puntaje = 0
+    print(f"\nIniciando nivel: {nivel.nombre}")
+    for pregunta in nivel.preguntas:
+        if vidas == 0:
             break
-        answer_index = choose_option(question.prompt, question.options)
-        selected = question.options[answer_index]
-        if selected == question.answer:
-            score += 10
-            print("✅ ¡Correcto!", question.feedback)
+        indice_respuesta = elegir_opcion(pregunta.enunciado, pregunta.opciones)
+        seleccion = pregunta.opciones[indice_respuesta]
+        if seleccion == pregunta.respuesta:
+            puntaje += 10
+            print("✅ ¡Correcto!", pregunta.retroalimentacion)
         else:
-            lives -= 1
-            print(f"❌ Respuesta incorrecta. {question.feedback}")
-            print(f"Vidas restantes: {lives}")
-            if lives > 0:
+            vidas -= 1
+            print(f"❌ Respuesta incorrecta. {pregunta.retroalimentacion}")
+            print(f"Vidas restantes: {vidas}")
+            if vidas > 0:
                 print("¡Ánimo! Puedes seguir intentándolo.")
-    if lives == 0:
+    if vidas == 0:
         print("El personaje se pone triste, pero puedes intentarlo de nuevo.")
     else:
         print("¡Felicidades! Has completado el nivel.")
-    print(f"Puntaje obtenido: {score}")
-    return score
+    print(f"Puntaje obtenido: {puntaje}")
+    return puntaje
 
 
-def start_new_game(periods: list[Period]) -> None:
-    period_index = choose_option(
+def iniciar_nueva_partida(periodos: list[Periodo]) -> None:
+    indice_periodo = elegir_opcion(
         "Selecciona el período histórico:",
-        [period.name for period in periods],
+        [periodo.nombre for periodo in periodos],
     )
-    levels = periods[period_index].levels
-    level_index = choose_option(
+    niveles = periodos[indice_periodo].niveles
+    indice_nivel = elegir_opcion(
         "Selecciona el nivel:",
-        [level.name for level in levels],
+        [nivel.nombre for nivel in niveles],
     )
-    score = play_level(levels[level_index])
-    save_game(period_index, level_index, score)
+    puntaje = jugar_nivel(niveles[indice_nivel])
+    guardar_partida(indice_periodo, indice_nivel, puntaje)
     print("Partida guardada.")
 
 
-def resume_game(periods: list[Period]) -> None:
-    data = load_game()
-    if data is None:
+def reanudar_partida(periodos: list[Periodo]) -> None:
+    datos = cargar_partida()
+    if datos is None:
         print("No hay partidas guardadas.")
         return
-    period_index = data.get("period_index", 0)
-    level_index = data.get("level_index", 0)
-    score = data.get("score", 0)
+    indice_periodo = datos.get("period_index", 0)
+    indice_nivel = datos.get("level_index", 0)
+    puntaje = datos.get("score", 0)
     print(
         "\nReanudando partida guardada:"
-        f"\nPeríodo: {periods[period_index].name}"
-        f"\nNivel: {periods[period_index].levels[level_index].name}"
-        f"\nPuntaje previo: {score}"
+        f"\nPeríodo: {periodos[indice_periodo].nombre}"
+        f"\nNivel: {periodos[indice_periodo].niveles[indice_nivel].nombre}"
+        f"\nPuntaje previo: {puntaje}"
     )
-    score += play_level(periods[period_index].levels[level_index])
-    save_game(period_index, level_index, score)
+    puntaje += jugar_nivel(periodos[indice_periodo].niveles[indice_nivel])
+    guardar_partida(indice_periodo, indice_nivel, puntaje)
     print("Partida actualizada.")
 
 
 def main() -> None:
-    periods = build_periods()
+    periodos = construir_periodos()
     while True:
         print("\n=== Juego de Historia Universal ===")
-        option = choose_option(
+        opcion = elegir_opcion(
             "Menú principal:",
             ["Iniciar nueva partida", "Cargar partida", "Salir"],
         )
-        if option == 0:
-            start_new_game(periods)
-        elif option == 1:
-            resume_game(periods)
+        if opcion == 0:
+            iniciar_nueva_partida(periodos)
+        elif opcion == 1:
+            reanudar_partida(periodos)
         else:
             print("Gracias por jugar. ¡Hasta pronto!")
             break
