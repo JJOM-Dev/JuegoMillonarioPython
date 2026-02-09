@@ -190,6 +190,20 @@
               </div>
             </div>
           </div>
+          <div class="mt-4 flex flex-wrap items-center gap-3">
+            <label class="text-xs font-semibold text-slate-500" for="selectorDificultad">Dificultad</label>
+            <select
+              class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm"
+              id="selectorDificultad"
+            >
+              <option value="principiante">Principiante</option>
+              <option value="facil">Fácil</option>
+              <option value="normal" selected>Normal</option>
+              <option value="dificil">Difícil</option>
+              <option value="hardcore">Hardcore</option>
+            </select>
+            <p class="text-xs text-slate-400" id="textoDificultad">Modo normal activado.</p>
+          </div>
 
           <div
             class="anim-aparecer mt-6 rounded-3xl bg-slate-50/80 p-6 shadow-inner transition-colors duration-300"
@@ -920,6 +934,17 @@
         tiempoRestante: 30,
         preguntaEspecial: false,
         preguntaActual: null,
+        dificultad: "normal",
+        configuracion: {
+          vidasIniciales: 5,
+          tiempoPregunta: 30,
+          tiempoEspecial: 10,
+          probabilidadEspecial: 0.1,
+          vidasExtraEspecial: 1,
+          antiTrampa: true,
+          comodines: { pista: 1, saltar: 1, investigar: 1 },
+          puedeGuardar: true,
+        },
         comodines: {
           pista: true,
           saltar: true,
@@ -944,6 +969,8 @@
       let botonSaltar;
       let botonInvestigar;
       let temporizador;
+      let selectorDificultad;
+      let textoDificultad;
 
       function renderizarCategorias() {
         contenedorCategorias.innerHTML = "";
@@ -959,7 +986,7 @@
           tarjeta.addEventListener("click", () => {
             estado.indiceCategoriaActual = indice;
             estado.indicePreguntaActual = 0;
-            estado.vidas = 3;
+            estado.vidas = estado.configuracion.vidasIniciales;
             estado.puntaje = 0;
             estado.ordenPreguntas = obtenerOrdenAleatorio(categoria.preguntas.length);
             actualizarJuego();
@@ -976,6 +1003,79 @@
         const categoria = estado.categorias[estado.indiceCategoriaActual];
         etiquetaCategoria.textContent = categoria.nombre;
         etiquetaNivel.textContent = "Reto activo";
+      }
+
+      function obtenerConfiguracion(dificultad) {
+        switch (dificultad) {
+          case "principiante":
+            return {
+              vidasIniciales: 0,
+              tiempoPregunta: 30,
+              tiempoEspecial: 0,
+              probabilidadEspecial: 0,
+              vidasExtraEspecial: 0,
+              antiTrampa: false,
+              comodines: { pista: 0, saltar: 0, investigar: 0 },
+              puedeGuardar: true,
+            };
+          case "facil":
+            return {
+              vidasIniciales: 10,
+              tiempoPregunta: 30,
+              tiempoEspecial: 10,
+              probabilidadEspecial: 0.1,
+              vidasExtraEspecial: 1,
+              antiTrampa: true,
+              comodines: { pista: 0, saltar: 2, investigar: 2 },
+              puedeGuardar: true,
+            };
+          case "dificil":
+            return {
+              vidasIniciales: 3,
+              tiempoPregunta: 20,
+              tiempoEspecial: 5,
+              probabilidadEspecial: 0.05,
+              vidasExtraEspecial: 1,
+              antiTrampa: true,
+              comodines: { pista: 0, saltar: 0, investigar: 0 },
+              puedeGuardar: true,
+            };
+          case "hardcore":
+            return {
+              vidasIniciales: 1,
+              tiempoPregunta: 10,
+              tiempoEspecial: 0,
+              probabilidadEspecial: 0,
+              vidasExtraEspecial: 0,
+              antiTrampa: true,
+              comodines: { pista: 0, saltar: 0, investigar: 0 },
+              puedeGuardar: false,
+            };
+          default:
+            return {
+              vidasIniciales: 5,
+              tiempoPregunta: 30,
+              tiempoEspecial: 10,
+              probabilidadEspecial: 0.1,
+              vidasExtraEspecial: 1,
+              antiTrampa: true,
+              comodines: { pista: 1, saltar: 1, investigar: 1 },
+              puedeGuardar: true,
+            };
+        }
+      }
+
+      function aplicarDificultad(nivel) {
+        estado.dificultad = nivel;
+        estado.configuracion = obtenerConfiguracion(nivel);
+        estado.vidas = estado.configuracion.vidasIniciales;
+        estado.tiempoLimite = estado.configuracion.tiempoPregunta;
+        estado.tiempoRestante = estado.configuracion.tiempoPregunta;
+        estado.comodines = { ...estado.configuracion.comodines };
+        estado.permitirSalidaHasta = 0;
+        actualizarComodines();
+        actualizarEstado();
+        textoDificultad.textContent = `Modo ${nivel} activado.`;
       }
 
       function actualizarPregunta() {
@@ -1013,18 +1113,24 @@
           boton.classList.add("anim-correcto", "bg-emerald-100", "text-emerald-700");
           textoFeedback.textContent = `✅ ${pregunta.retroalimentacion}`;
           lanzarConfeti();
-          if (estado.preguntaEspecial) {
-            estado.vidas += 1;
+          if (estado.preguntaEspecial && estado.configuracion.vidasExtraEspecial > 0) {
+            estado.vidas += estado.configuracion.vidasExtraEspecial;
             textoFeedback.textContent += " ¡Pregunta especial! Ganaste una vida.";
           }
         } else {
-          estado.vidas -= 1;
+          if (estado.configuracion.vidasIniciales > 0) {
+            estado.vidas -= 1;
+          }
           boton.classList.add("anim-error", "bg-rose-100", "text-rose-700");
           textoFeedback.textContent = `❌ ${pregunta.retroalimentacion} Te quedan ${estado.vidas} vidas.`;
+          if (estado.dificultad === "hardcore") {
+            perderPartida("Modo hardcore: fallaste la pregunta.");
+            return;
+          }
         }
         actualizarEstado();
         guardarPartida();
-        if (estado.vidas <= 0) {
+        if (estado.configuracion.vidasIniciales > 0 && estado.vidas <= 0) {
           perderPartida("Perdiste todas las vidas.");
           return;
         }
@@ -1050,6 +1156,10 @@
       }
 
       function guardarPartida() {
+        if (!estado.configuracion.puedeGuardar) {
+          estadoGuardado.textContent = "En modo hardcore no se guardan partidas.";
+          return;
+        }
         const nombre = entradaNombre?.value?.trim();
         if (!nombre) {
           const categoria = estado.categorias[estado.indiceCategoriaActual]?.nombre ?? "Partida";
@@ -1068,6 +1178,7 @@
           tiempoLimite: estado.tiempoLimite,
           preguntaEspecial: estado.preguntaEspecial,
           comodines: estado.comodines,
+          dificultad: estado.dificultad,
         };
         localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(datos));
 
@@ -1109,6 +1220,10 @@
         estado.tiempoLimite = datos.tiempoLimite ?? 30;
         estado.preguntaEspecial = datos.preguntaEspecial ?? false;
         estado.comodines = datos.comodines ?? { pista: true, saltar: true, investigar: true };
+        if (datos.dificultad) {
+          selectorDificultad.value = datos.dificultad;
+          aplicarDificultad(datos.dificultad);
+        }
         estadoGuardado.textContent = "Partida cargada.";
         return true;
       }
@@ -1131,6 +1246,10 @@
         estado.tiempoLimite = registro.datos.tiempoLimite ?? 30;
         estado.preguntaEspecial = registro.datos.preguntaEspecial ?? false;
         estado.comodines = registro.datos.comodines ?? { pista: true, saltar: true, investigar: true };
+        if (registro.datos.dificultad) {
+          selectorDificultad.value = registro.datos.dificultad;
+          aplicarDificultad(registro.datos.dificultad);
+        }
         localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(registro.datos));
         estadoGuardado.textContent = `Partida cargada: ${registro.nombre}`;
         actualizarJuego();
@@ -1191,15 +1310,15 @@
       }
 
       function seleccionarPregunta(categoria) {
-        const esEspecial = Math.random() < 0.1;
+        const esEspecial = Math.random() < estado.configuracion.probabilidadEspecial;
         estado.preguntaEspecial = esEspecial;
         if (esEspecial) {
-          estado.tiempoLimite = 10;
-          estado.tiempoRestante = 10;
+          estado.tiempoLimite = estado.configuracion.tiempoEspecial;
+          estado.tiempoRestante = estado.configuracion.tiempoEspecial;
           return obtenerPreguntaEspecial();
         }
-        estado.tiempoLimite = 30;
-        estado.tiempoRestante = 30;
+        estado.tiempoLimite = estado.configuracion.tiempoPregunta;
+        estado.tiempoRestante = estado.configuracion.tiempoPregunta;
         const indiceReal = estado.ordenPreguntas[estado.indicePreguntaActual];
         return categoria.preguntas[indiceReal];
       }
@@ -1248,8 +1367,7 @@
           etiquetaTiempo.textContent = estado.tiempoRestante;
           if (estado.tiempoRestante <= 0) {
             detenerTemporizador();
-            estado.vidas = 0;
-            perderPartida("Se acabó el tiempo.");
+            perderPregunta("Se acabó el tiempo.");
           }
         }, 1000);
       }
@@ -1262,26 +1380,47 @@
       }
 
       function perderPartida(mensaje) {
-        estado.vidas = 0;
         textoPregunta.textContent = "Partida perdida.";
         contenedorOpciones.innerHTML = "";
         textoFeedback.textContent = `${mensaje} Debes empezar de cero.`;
         estado.indicePreguntaActual = 0;
         estado.puntaje = 0;
+        estado.vidas = estado.configuracion.vidasIniciales;
         estado.ordenPreguntas = obtenerOrdenAleatorio(
           estado.categorias[estado.indiceCategoriaActual].preguntas.length
         );
-        estado.comodines = { pista: true, saltar: true, investigar: true };
+        estado.comodines = { ...estado.configuracion.comodines };
         detenerTemporizador();
         actualizarEstado();
         actualizarComodines();
         guardarPartida();
       }
 
+      function perderPregunta(mensaje) {
+        textoFeedback.textContent = `${mensaje} Pierdes la pregunta.`;
+        if (estado.configuracion.vidasIniciales > 0) {
+          estado.vidas = Math.max(0, estado.vidas - 1);
+        }
+        estado.indicePreguntaActual += 1;
+        if (estado.dificultad === "hardcore") {
+          perderPartida("Modo hardcore: perdiste la pregunta.");
+          return;
+        }
+        if (estado.vidas <= 0 && estado.configuracion.vidasIniciales > 0) {
+          perderPartida("Perdiste todas las vidas.");
+          return;
+        }
+        actualizarEstado();
+        actualizarPregunta();
+      }
+
       function actualizarComodines() {
-        botonPista.disabled = !estado.comodines.pista;
-        botonSaltar.disabled = !estado.comodines.saltar;
-        botonInvestigar.disabled = !estado.comodines.investigar;
+        botonPista.disabled = estado.comodines.pista <= 0;
+        botonSaltar.disabled = estado.comodines.saltar <= 0;
+        botonInvestigar.disabled = estado.comodines.investigar <= 0;
+        botonPista.textContent = `Comodín: Pista (${estado.comodines.pista})`;
+        botonSaltar.textContent = `Comodín: Saltar (${estado.comodines.saltar})`;
+        botonInvestigar.textContent = `Comodín: Investigar 10s (${estado.comodines.investigar})`;
       }
 
       function usarComodinPista() {
@@ -1292,7 +1431,7 @@
         const respuesta = estado.preguntaActual?.respuesta ?? "";
         const pista = `Pista: piensa en la categoría ${categoria.nombre} y la respuesta inicia con \"${respuesta[0]}\".`;
         textoFeedback.textContent = pista;
-        estado.comodines.pista = false;
+        estado.comodines.pista -= 1;
         actualizarComodines();
         guardarPartida();
       }
@@ -1301,7 +1440,7 @@
         if (!estado.comodines.saltar) {
           return;
         }
-        estado.comodines.saltar = false;
+        estado.comodines.saltar -= 1;
         estado.indicePreguntaActual += 1;
         actualizarComodines();
         actualizarPregunta();
@@ -1312,7 +1451,7 @@
         if (!estado.comodines.investigar) {
           return;
         }
-        estado.comodines.investigar = false;
+        estado.comodines.investigar -= 1;
         estado.permitirSalidaHasta = Date.now() + 10000;
         actualizarComodines();
         estadoGuardado.textContent = "Puedes salir 10 segundos para investigar.";
@@ -1321,12 +1460,15 @@
 
       function gestionarSalidaVentana() {
         if (document.hidden) {
+          if (!estado.configuracion.antiTrampa) {
+            return;
+          }
           if (Date.now() > estado.permitirSalidaHasta) {
-            perderPartida("Saliste de la pestaña sin comodín.");
+            perderPregunta("Saliste de la pestaña sin comodín.");
           } else {
             setTimeout(() => {
               if (document.hidden && Date.now() > estado.permitirSalidaHasta) {
-                perderPartida("No regresaste a tiempo.");
+                perderPregunta("No regresaste a tiempo.");
               }
             }, 11000);
           }
@@ -1339,11 +1481,12 @@
             const accion = boton.dataset.action;
             if (accion === "nuevo") {
               estado.indicePreguntaActual = 0;
-              estado.vidas = 3;
+              estado.vidas = estado.configuracion.vidasIniciales;
               estado.puntaje = 0;
               estado.ordenPreguntas = obtenerOrdenAleatorio(
                 estado.categorias[estado.indiceCategoriaActual].preguntas.length
               );
+              estado.comodines = { ...estado.configuracion.comodines };
               actualizarJuego();
               guardarPartida();
               estadoGuardado.textContent = "Nueva partida iniciada.";
@@ -1379,10 +1522,13 @@
         botonPista = document.getElementById("comodinPista");
         botonSaltar = document.getElementById("comodinSaltar");
         botonInvestigar = document.getElementById("comodinInvestigar");
+        selectorDificultad = document.getElementById("selectorDificultad");
+        textoDificultad = document.getElementById("textoDificultad");
 
         renderizarCategorias();
         enlazarMenu();
         estado.ordenPreguntas = obtenerOrdenAleatorio(estado.categorias[0].preguntas.length);
+        aplicarDificultad(selectorDificultad.value);
         actualizarJuego();
         renderizarGuardados();
         actualizarComodines();
@@ -1401,6 +1547,9 @@
         botonSaltar.addEventListener("click", usarComodinSaltar);
         botonInvestigar.addEventListener("click", usarComodinInvestigar);
         document.addEventListener("visibilitychange", gestionarSalidaVentana);
+        selectorDificultad.addEventListener("change", () => {
+          aplicarDificultad(selectorDificultad.value);
+        });
       });
     </script>
   </body>

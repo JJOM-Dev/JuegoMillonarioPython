@@ -702,8 +702,10 @@ class AplicacionJuego:
         self.pregunta_especial = False
         self.pregunta_actual: Pregunta | None = None
         self.temporizador_id: str | None = None
-        self.comodines = {"pista": True, "saltar": True, "investigar": True}
+        self.comodines = {"pista": 1, "saltar": 1, "investigar": 1}
         self.permitir_salida_hasta: float = 0.0
+        self.dificultad = "normal"
+        self.configuracion = self._obtener_configuracion("normal")
 
         self.particulas_confeti: list[tuple[int, int, int, int, str]] = []
 
@@ -739,6 +741,86 @@ class AplicacionJuego:
         )
         estilo.map("BotonSecundario.TButton", background=[("active", "#e5e7eb")])
 
+    def _obtener_configuracion(self, nivel: str) -> dict:
+        configuraciones = {
+            "principiante": {
+                "vidas_iniciales": 0,
+                "tiempo_pregunta": 30,
+                "tiempo_especial": 0,
+                "probabilidad_especial": 0,
+                "vidas_extra_especial": 0,
+                "anti_trampa": False,
+                "comodines": {"pista": 0, "saltar": 0, "investigar": 0},
+                "puede_guardar": True,
+            },
+            "facil": {
+                "vidas_iniciales": 10,
+                "tiempo_pregunta": 30,
+                "tiempo_especial": 10,
+                "probabilidad_especial": 0.1,
+                "vidas_extra_especial": 1,
+                "anti_trampa": True,
+                "comodines": {"pista": 0, "saltar": 2, "investigar": 2},
+                "puede_guardar": True,
+            },
+            "normal": {
+                "vidas_iniciales": 5,
+                "tiempo_pregunta": 30,
+                "tiempo_especial": 10,
+                "probabilidad_especial": 0.1,
+                "vidas_extra_especial": 1,
+                "anti_trampa": True,
+                "comodines": {"pista": 1, "saltar": 1, "investigar": 1},
+                "puede_guardar": True,
+            },
+            "dificil": {
+                "vidas_iniciales": 3,
+                "tiempo_pregunta": 20,
+                "tiempo_especial": 5,
+                "probabilidad_especial": 0.05,
+                "vidas_extra_especial": 1,
+                "anti_trampa": True,
+                "comodines": {"pista": 0, "saltar": 0, "investigar": 0},
+                "puede_guardar": True,
+            },
+            "hardcore": {
+                "vidas_iniciales": 1,
+                "tiempo_pregunta": 10,
+                "tiempo_especial": 0,
+                "probabilidad_especial": 0,
+                "vidas_extra_especial": 0,
+                "anti_trampa": True,
+                "comodines": {"pista": 0, "saltar": 0, "investigar": 0},
+                "puede_guardar": False,
+            },
+        }
+        return configuraciones.get(nivel, configuraciones["normal"]).copy()
+
+    def _aplicar_dificultad(self, nivel: str, actualizar_selector: bool = False) -> None:
+        self.dificultad = nivel
+        self.configuracion = self._obtener_configuracion(nivel)
+        self.vidas = self.configuracion["vidas_iniciales"]
+        self.tiempo_limite = self.configuracion["tiempo_pregunta"]
+        self.tiempo_restante = self.configuracion["tiempo_pregunta"]
+        self.comodines = self.configuracion["comodines"].copy()
+        if actualizar_selector and hasattr(self, "selector_dificultad"):
+            opciones = ["principiante", "facil", "normal", "dificil", "hardcore"]
+            if nivel in opciones:
+                self.selector_dificultad.current(opciones.index(nivel))
+        self._actualizar_comodines()
+        self._actualizar_panel()
+
+    def _cambiar_dificultad(self, _evento: tk.Event) -> None:
+        valores = {
+            "Principiante": "principiante",
+            "Fácil": "facil",
+            "Normal": "normal",
+            "Difícil": "dificil",
+            "Hardcore": "hardcore",
+        }
+        seleccion = valores.get(self.selector_dificultad.get(), "normal")
+        self._aplicar_dificultad(seleccion)
+
     def _construir_interfaz(self) -> None:
         self.contenedor = ttk.Frame(self.raiz)
         self.contenedor.pack(fill="both", expand=True, padx=20, pady=20)
@@ -754,6 +836,7 @@ class AplicacionJuego:
             style="Texto.TLabel",
         ).pack(anchor="w", padx=20, pady=(4, 16))
 
+        self._aplicar_dificultad(self.dificultad, actualizar_selector=True)
         self.zona_principal = ttk.Frame(self.contenedor)
         self.zona_principal.pack(fill="both", expand=True)
 
@@ -768,6 +851,16 @@ class AplicacionJuego:
         ttk.Button(self.columna_menu, text="Cargar partida", style="BotonSecundario.TButton", command=self.cargar_partida).pack(
             fill="x", padx=16, pady=4
         )
+
+        ttk.Label(self.columna_menu, text="Dificultad", style="Texto.TLabel").pack(anchor="w", padx=16, pady=(12, 4))
+        self.selector_dificultad = ttk.Combobox(
+            self.columna_menu,
+            values=["Principiante", "Fácil", "Normal", "Difícil", "Hardcore"],
+            state="readonly",
+        )
+        self.selector_dificultad.current(2)
+        self.selector_dificultad.pack(fill="x", padx=16)
+        self.selector_dificultad.bind("<<ComboboxSelected>>", self._cambiar_dificultad)
 
         ttk.Label(self.columna_menu, text="Nombre de la partida", style="Texto.TLabel").pack(anchor="w", padx=16, pady=(12, 4))
         self.entrada_nombre = ttk.Entry(self.columna_menu)
@@ -784,6 +877,7 @@ class AplicacionJuego:
         self.lista_guardados = tk.Listbox(self.columna_menu, height=10)
         self.lista_guardados.pack(fill="x", padx=16, pady=6)
         self.lista_guardados.bind("<<ListboxSelect>>", self._seleccionar_guardado)
+        self.selector_dificultad.bind("<<ComboboxSelected>>", self._cambiar_dificultad)
 
         self.columna_juego = ttk.Frame(self.zona_principal, style="Tarjeta.TFrame")
         self.columna_juego.pack(side="left", fill="both", expand=True)
@@ -894,14 +988,14 @@ class AplicacionJuego:
         self._actualizar_comodines()
 
     def _seleccionar_pregunta(self, categoria: Categoria, indice_real: int) -> Pregunta:
-        es_especial = random.randint(1, 10) == 1
+        es_especial = random.random() < self.configuracion["probabilidad_especial"]
         self.pregunta_especial = es_especial
         if es_especial:
-            self.tiempo_limite = 10
-            self.tiempo_restante = 10
+            self.tiempo_limite = self.configuracion["tiempo_especial"]
+            self.tiempo_restante = self.configuracion["tiempo_especial"]
             return self._obtener_pregunta_especial(categoria.nombre)
-        self.tiempo_limite = 30
-        self.tiempo_restante = 30
+        self.tiempo_limite = self.configuracion["tiempo_pregunta"]
+        self.tiempo_restante = self.configuracion["tiempo_pregunta"]
         return categoria.preguntas[indice_real]
 
     def _obtener_pregunta_especial(self, categoria: str) -> Pregunta:
@@ -969,7 +1063,7 @@ class AplicacionJuego:
 
     def _tiempo_agotado(self) -> None:
         self._detener_temporizador()
-        self._perder_partida("Se acabó el tiempo.")
+        self._perder_pregunta("Se acabó el tiempo.")
 
     def _perder_partida(self, mensaje: str) -> None:
         self.vidas = 0
@@ -977,54 +1071,70 @@ class AplicacionJuego:
         self.indice_pregunta = 0
         self.orden_preguntas = list(range(len(self.categorias[self.indice_categoria].preguntas)))
         random.shuffle(self.orden_preguntas)
-        self.comodines = {"pista": True, "saltar": True, "investigar": True}
+        self.vidas = self.configuracion["vidas_iniciales"]
+        self.comodines = self.configuracion["comodines"].copy()
         self.retroalimentacion.config(text=f"{mensaje} Debes empezar de cero.")
         self._actualizar_comodines()
         self._detener_temporizador()
         self._guardar_automatico()
         self._actualizar_panel()
 
+    def _perder_pregunta(self, mensaje: str) -> None:
+        self.retroalimentacion.config(text=f"{mensaje} Pierdes la pregunta.")
+        if self.configuracion["vidas_iniciales"] > 0:
+            self.vidas = max(0, self.vidas - 1)
+        self.indice_pregunta += 1
+        if self.dificultad == "hardcore":
+            self._perder_partida("Modo hardcore: perdiste la pregunta.")
+            return
+        if self.configuracion["vidas_iniciales"] > 0 and self.vidas <= 0:
+            self._perder_partida("Has perdido todas las vidas.")
+            return
+        self._actualizar_panel()
+
     def _actualizar_comodines(self) -> None:
-        for boton, disponible in zip(self.panel_comodines.winfo_children(), self.comodines.values()):
-            boton.configure(state="normal" if disponible else "disabled")
+        for boton, cantidad in zip(self.panel_comodines.winfo_children(), self.comodines.values()):
+            boton.configure(state="normal" if cantidad > 0 else "disabled")
 
     def usar_comodin_pista(self) -> None:
-        if not self.comodines["pista"] or not self.pregunta_actual:
+        if self.comodines["pista"] <= 0 or not self.pregunta_actual:
             return
         pista = f"Pista: la respuesta inicia con \"{self.pregunta_actual.respuesta[0]}\"."
         self.retroalimentacion.config(text=pista)
-        self.comodines["pista"] = False
+        self.comodines["pista"] -= 1
         self._actualizar_comodines()
         self._guardar_automatico()
 
     def usar_comodin_saltar(self) -> None:
-        if not self.comodines["saltar"]:
+        if self.comodines["saltar"] <= 0:
             return
-        self.comodines["saltar"] = False
+        self.comodines["saltar"] -= 1
         self.indice_pregunta += 1
         self._actualizar_comodines()
         self._actualizar_panel()
         self._guardar_automatico()
 
     def usar_comodin_investigar(self) -> None:
-        if not self.comodines["investigar"]:
+        if self.comodines["investigar"] <= 0:
             return
-        self.comodines["investigar"] = False
+        self.comodines["investigar"] -= 1
         self.permitir_salida_hasta = datetime.now().timestamp() + 10
         self.estado_guardado.config(text="Puedes salir 10 segundos para investigar.")
         self._actualizar_comodines()
         self._guardar_automatico()
 
     def _gestionar_salida(self, _evento: tk.Event) -> None:
+        if not self.configuracion["anti_trampa"]:
+            return
         ahora = datetime.now().timestamp()
         if ahora > self.permitir_salida_hasta:
-            self._perder_partida("Saliste de la ventana sin comodín.")
+            self._perder_pregunta("Saliste de la ventana sin comodín.")
         else:
             self.raiz.after(11000, self._comprobar_regreso)
 
     def _comprobar_regreso(self) -> None:
         if not self.raiz.focus_displayof():
-            self._perder_partida("No regresaste a tiempo.")
+            self._perder_pregunta("No regresaste a tiempo.")
 
     def responder(self, opcion: str) -> None:
         if not self.pregunta_actual:
@@ -1034,17 +1144,21 @@ class AplicacionJuego:
             self.puntaje += 10
             self.retroalimentacion.config(text=f"✅ {self.pregunta_actual.retroalimentacion}")
             self._lanzar_confeti()
-            if self.pregunta_especial:
+            if self.pregunta_especial and self.configuracion["vidas_extra_especial"] > 0:
                 self.vidas += 1
                 self.retroalimentacion.config(text=f"✅ {self.pregunta_actual.retroalimentacion} ¡Ganaste una vida!")
         else:
-            self.vidas -= 1
+            if self.configuracion["vidas_iniciales"] > 0:
+                self.vidas -= 1
             self.retroalimentacion.config(
                 text=f"❌ {self.pregunta_actual.retroalimentacion} Te quedan {self.vidas} vidas."
             )
 
         self.indice_pregunta += 1
-        if self.vidas <= 0:
+        if self.dificultad == "hardcore" and opcion != self.pregunta_actual.respuesta:
+            self._perder_partida("Modo hardcore: fallaste la pregunta.")
+            return
+        if self.configuracion["vidas_iniciales"] > 0 and self.vidas <= 0:
             self._perder_partida("Has perdido todas las vidas.")
             return
         self._guardar_automatico()
@@ -1053,31 +1167,36 @@ class AplicacionJuego:
     def seleccionar_categoria(self, indice: int) -> None:
         self.indice_categoria = indice
         self.indice_pregunta = 0
-        self.vidas = 3
+        self.vidas = self.configuracion["vidas_iniciales"]
         self.puntaje = 0
         self.orden_preguntas = list(range(len(self.categorias[indice].preguntas)))
         random.shuffle(self.orden_preguntas)
-        self.comodines = {"pista": True, "saltar": True, "investigar": True}
+        self.comodines = self.configuracion["comodines"].copy()
         self._actualizar_panel()
         self._guardar_automatico()
 
     def nueva_partida(self) -> None:
         self.indice_categoria = 0
         self.indice_pregunta = 0
-        self.vidas = 3
+        self.vidas = self.configuracion["vidas_iniciales"]
         self.puntaje = 0
         self.orden_preguntas = list(range(len(self.categorias[0].preguntas)))
         random.shuffle(self.orden_preguntas)
-        self.comodines = {"pista": True, "saltar": True, "investigar": True}
+        self.comodines = self.configuracion["comodines"].copy()
         self._actualizar_panel()
         self._guardar_automatico()
 
     def _guardar_automatico(self) -> None:
+        if not self.configuracion["puede_guardar"]:
+            return
         nombre = self.entrada_nombre.get().strip()
         if nombre:
             self._guardar_con_nombre(nombre)
 
     def guardar_partida(self) -> None:
+        if not self.configuracion["puede_guardar"]:
+            messagebox.showwarning("Modo hardcore", "En modo hardcore no se guardan partidas.")
+            return
         nombre = self.entrada_nombre.get().strip()
         if not nombre:
             messagebox.showwarning("Nombre requerido", "Escribe un nombre para guardar la partida.")
@@ -1103,6 +1222,7 @@ class AplicacionJuego:
                 "tiempo_restante": self.tiempo_restante,
                 "pregunta_especial": self.pregunta_especial,
                 "comodines": self.comodines,
+                "dificultad": self.dificultad,
             },
         }
         guardados = [g for g in guardados if g["nombre"] != nombre]
@@ -1139,6 +1259,8 @@ class AplicacionJuego:
         self.tiempo_restante = estado.get("tiempo_restante", 30)
         self.pregunta_especial = estado.get("pregunta_especial", False)
         self.comodines = estado.get("comodines", {"pista": True, "saltar": True, "investigar": True})
+        if estado.get("dificultad"):
+            self._aplicar_dificultad(estado["dificultad"], actualizar_selector=True)
         self.entrada_nombre.delete(0, tk.END)
         self.entrada_nombre.insert(0, registro["nombre"])
         self.estado_guardado.config(text=f"Partida cargada: {registro['nombre']}")
