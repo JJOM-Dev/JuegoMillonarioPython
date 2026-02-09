@@ -23,7 +23,7 @@
           </p>
         </div>
         <div class="hero__badge">
-          <span>Neumorphism UI</span>
+          <span>Daniel Rivera · José Osorio · Nelson Carrillo</span>
         </div>
       </header>
 
@@ -73,6 +73,24 @@
       <section class="card timeline">
         <h2>Períodos Disponibles</h2>
         <div class="timeline__grid" id="periods"></div>
+      </section>
+
+      <section class="card team">
+        <h2>Integrantes</h2>
+        <ul class="team__list">
+          <li>
+            <strong>Daniel Rivera</strong>
+            <span>C.I: 31.048.830</span>
+          </li>
+          <li>
+            <strong>José Osorio</strong>
+            <span>C.I: 30.973.057</span>
+          </li>
+          <li>
+            <strong>Nelson Carrillo</strong>
+            <span>C.I: 31.611.962</span>
+          </li>
+        </ul>
       </section>
     </div>
 
@@ -151,6 +169,7 @@
         box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
         font-weight: 600;
         color: var(--accent);
+        animation: flotar 3s ease-in-out infinite;
       }
 
       .layout {
@@ -191,12 +210,13 @@
         cursor: pointer;
         font-weight: 600;
         color: var(--text);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
       }
 
       .btn:hover {
         transform: translateY(-2px);
         box-shadow: 4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
+        filter: brightness(1.02);
       }
 
       .btn--primary {
@@ -242,6 +262,11 @@
         box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
         text-align: center;
         min-width: 90px;
+        transition: transform 0.2s ease;
+      }
+
+      .game__stats div:hover {
+        transform: translateY(-2px);
       }
 
       .question {
@@ -249,6 +274,7 @@
         border-radius: 20px;
         padding: 20px;
         box-shadow: inset 8px 8px 16px var(--shadow-dark), inset -8px -8px 16px var(--shadow-light);
+        animation: aparecer-suave 0.5s ease;
       }
 
       .question__text {
@@ -271,20 +297,25 @@
         transition: all 0.2s ease;
         font-weight: 600;
         text-align: left;
+        position: relative;
+        overflow: hidden;
       }
 
       .option:hover {
         transform: translateY(-2px);
+        box-shadow: 4px 4px 12px rgba(95, 107, 255, 0.25), -4px -4px 12px var(--shadow-light);
       }
 
       .option--correct {
         background: #d7f5df;
         color: #1c6b37;
+        animation: resplandor-correcto 0.9s ease;
       }
 
       .option--wrong {
         background: #ffe0e0;
         color: #8a2222;
+        animation: sacudir-error 0.5s ease;
       }
 
       .feedback {
@@ -299,6 +330,65 @@
 
       .feedback__icon {
         font-size: 1.4rem;
+      }
+
+      .feedback {
+        animation: aparecer-suave 0.4s ease;
+      }
+
+      @keyframes resplandor-correcto {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 0 rgba(40, 200, 120, 0.4);
+        }
+        50% {
+          transform: scale(1.02);
+          box-shadow: 0 0 18px rgba(40, 200, 120, 0.6);
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 rgba(40, 200, 120, 0.3);
+        }
+      }
+
+      @keyframes sacudir-error {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20% {
+          transform: translateX(-6px);
+        }
+        40% {
+          transform: translateX(6px);
+        }
+        60% {
+          transform: translateX(-4px);
+        }
+        80% {
+          transform: translateX(4px);
+        }
+      }
+
+      @keyframes aparecer-suave {
+        0% {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes flotar {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-4px);
+        }
       }
 
       .timeline {
@@ -322,9 +412,41 @@
         display: flex;
         flex-direction: column;
         gap: 6px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
 
       .period span {
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .period:hover {
+        transform: translateY(-3px);
+        box-shadow: 4px 4px 12px rgba(95, 107, 255, 0.2), -4px -4px 12px var(--shadow-light);
+      }
+
+      .team__list {
+        list-style: none;
+        display: grid;
+        gap: 12px;
+      }
+
+      .team__list li {
+        padding: 12px 16px;
+        border-radius: 16px;
+        background: var(--surface);
+        box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        transition: transform 0.2s ease;
+      }
+
+      .team__list li:hover {
+        transform: translateY(-2px);
+      }
+
+      .team__list span {
         color: var(--muted);
         font-size: 0.85rem;
       }
@@ -354,7 +476,6 @@
           padding: 20px;
         }
       }
-    </style>
     </style>
     <script>
       /*
