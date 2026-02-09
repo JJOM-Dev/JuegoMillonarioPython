@@ -840,7 +840,6 @@ class AplicacionJuego:
             style="Texto.TLabel",
         ).pack(anchor="w", padx=20, pady=(4, 16))
 
-        self._aplicar_dificultad(self.dificultad, actualizar_selector=True)
         self.zona_principal = ttk.Frame(self.contenedor)
         self.zona_principal.pack(fill="both", expand=True)
 
@@ -962,6 +961,8 @@ class AplicacionJuego:
                 command=lambda i=indice: self.seleccionar_categoria(i),
             )
             boton.pack(side="left", padx=4, pady=4)
+
+        self._aplicar_dificultad(self.dificultad, actualizar_selector=True)
 
     def _actualizar_panel(self) -> None:
         categoria = self.categorias[self.indice_categoria]
