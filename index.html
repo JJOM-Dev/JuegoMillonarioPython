@@ -183,6 +183,11 @@
               >
                 Puntaje <span class="ml-1 text-slate-700" id="puntaje">0</span>
               </div>
+              <div
+                class="rounded-2xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-500 shadow-sm"
+              >
+                Tiempo <span class="ml-1 text-slate-700" id="tiempoRestante">30</span>s
+              </div>
             </div>
           </div>
 
@@ -202,6 +207,26 @@
           >
             <span class="text-lg">✨</span>
             <p class="text-sm text-slate-600" id="textoFeedback">Elige un reto para iniciar.</p>
+          </div>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <button
+              class="rounded-2xl border border-indigo-200 bg-white px-4 py-2 text-xs font-semibold text-indigo-600 shadow-sm transition hover:-translate-y-0.5 disabled:opacity-50"
+              id="comodinPista"
+            >
+              Comodín: Pista
+            </button>
+            <button
+              class="rounded-2xl border border-amber-200 bg-white px-4 py-2 text-xs font-semibold text-amber-600 shadow-sm transition hover:-translate-y-0.5 disabled:opacity-50"
+              id="comodinSaltar"
+            >
+              Comodín: Saltar
+            </button>
+            <button
+              class="rounded-2xl border border-emerald-200 bg-white px-4 py-2 text-xs font-semibold text-emerald-600 shadow-sm transition hover:-translate-y-0.5 disabled:opacity-50"
+              id="comodinInvestigar"
+            >
+              Comodín: Investigar 10s
+            </button>
           </div>
         </main>
       </section>
@@ -891,6 +916,16 @@
         vidas: 3,
         puntaje: 0,
         ordenPreguntas: [],
+        tiempoLimite: 30,
+        tiempoRestante: 30,
+        preguntaEspecial: false,
+        preguntaActual: null,
+        comodines: {
+          pista: true,
+          saltar: true,
+          investigar: true,
+        },
+        permitirSalidaHasta: 0,
       };
 
       let contenedorCategorias;
@@ -904,6 +939,11 @@
       let estadoGuardado;
       let entradaNombre;
       let listaGuardados;
+      let etiquetaTiempo;
+      let botonPista;
+      let botonSaltar;
+      let botonInvestigar;
+      let temporizador;
 
       function renderizarCategorias() {
         contenedorCategorias.innerHTML = "";
@@ -932,6 +972,7 @@
       function actualizarEstado() {
         etiquetaVidas.textContent = estado.vidas;
         etiquetaPuntaje.textContent = estado.puntaje;
+        etiquetaTiempo.textContent = estado.tiempoRestante;
         const categoria = estado.categorias[estado.indiceCategoriaActual];
         etiquetaCategoria.textContent = categoria.nombre;
         etiquetaNivel.textContent = "Reto activo";
@@ -942,8 +983,8 @@
         if (!estado.ordenPreguntas.length) {
           estado.ordenPreguntas = obtenerOrdenAleatorio(categoria.preguntas.length);
         }
-        const indiceReal = estado.ordenPreguntas[estado.indicePreguntaActual];
-        const pregunta = categoria.preguntas[indiceReal];
+        const pregunta = seleccionarPregunta(categoria);
+        estado.preguntaActual = pregunta;
         if (!pregunta) {
           textoPregunta.textContent = "¡Categoría completada!";
           contenedorOpciones.innerHTML = "";
@@ -962,6 +1003,7 @@
           contenedorOpciones.appendChild(boton);
         });
         textoFeedback.textContent = "Selecciona la opción correcta.";
+        iniciarTemporizador();
       }
 
       function manejarRespuesta(opcionSeleccionada, pregunta, boton) {
@@ -971,6 +1013,10 @@
           boton.classList.add("anim-correcto", "bg-emerald-100", "text-emerald-700");
           textoFeedback.textContent = `✅ ${pregunta.retroalimentacion}`;
           lanzarConfeti();
+          if (estado.preguntaEspecial) {
+            estado.vidas += 1;
+            textoFeedback.textContent += " ¡Pregunta especial! Ganaste una vida.";
+          }
         } else {
           estado.vidas -= 1;
           boton.classList.add("anim-error", "bg-rose-100", "text-rose-700");
@@ -979,10 +1025,7 @@
         actualizarEstado();
         guardarPartida();
         if (estado.vidas <= 0) {
-          textoPregunta.textContent = "Perdiste las vidas.";
-          contenedorOpciones.innerHTML = "";
-          textoFeedback.textContent = "El personaje está triste, pero puedes intentarlo de nuevo.";
-          guardarPartida();
+          perderPartida("Perdiste todas las vidas.");
           return;
         }
         setTimeout(() => {
@@ -994,6 +1037,7 @@
       function actualizarJuego() {
         actualizarEstado();
         actualizarPregunta();
+        actualizarComodines();
       }
 
       function obtenerGuardados() {
@@ -1020,6 +1064,10 @@
           vidas: estado.vidas,
           puntaje: estado.puntaje,
           ordenPreguntas: estado.ordenPreguntas,
+          tiempoRestante: estado.tiempoRestante,
+          tiempoLimite: estado.tiempoLimite,
+          preguntaEspecial: estado.preguntaEspecial,
+          comodines: estado.comodines,
         };
         localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(datos));
 
@@ -1057,6 +1105,10 @@
         estado.puntaje = datos.puntaje ?? 0;
         estado.ordenPreguntas =
           datos.ordenPreguntas ?? obtenerOrdenAleatorio(estado.categorias[estado.indiceCategoriaActual].preguntas.length);
+        estado.tiempoRestante = datos.tiempoRestante ?? 30;
+        estado.tiempoLimite = datos.tiempoLimite ?? 30;
+        estado.preguntaEspecial = datos.preguntaEspecial ?? false;
+        estado.comodines = datos.comodines ?? { pista: true, saltar: true, investigar: true };
         estadoGuardado.textContent = "Partida cargada.";
         return true;
       }
@@ -1075,6 +1127,10 @@
         estado.ordenPreguntas =
           registro.datos.ordenPreguntas ??
           obtenerOrdenAleatorio(estado.categorias[estado.indiceCategoriaActual].preguntas.length);
+        estado.tiempoRestante = registro.datos.tiempoRestante ?? 30;
+        estado.tiempoLimite = registro.datos.tiempoLimite ?? 30;
+        estado.preguntaEspecial = registro.datos.preguntaEspecial ?? false;
+        estado.comodines = registro.datos.comodines ?? { pista: true, saltar: true, investigar: true };
         localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(registro.datos));
         estadoGuardado.textContent = `Partida cargada: ${registro.nombre}`;
         actualizarJuego();
@@ -1134,6 +1190,149 @@
         });
       }
 
+      function seleccionarPregunta(categoria) {
+        const esEspecial = Math.random() < 0.1;
+        estado.preguntaEspecial = esEspecial;
+        if (esEspecial) {
+          estado.tiempoLimite = 10;
+          estado.tiempoRestante = 10;
+          return obtenerPreguntaEspecial();
+        }
+        estado.tiempoLimite = 30;
+        estado.tiempoRestante = 30;
+        const indiceReal = estado.ordenPreguntas[estado.indicePreguntaActual];
+        return categoria.preguntas[indiceReal];
+      }
+
+      function obtenerPreguntaEspecial() {
+        const especiales = [
+          {
+            enunciado: "¿Qué teoría sugiere que la Atlántida pudo estar cerca del Mediterráneo?",
+            opciones: ["Hipótesis mediterránea", "Teoría lunar", "Teoría polar", "Hipótesis marciana"],
+            respuesta: "Hipótesis mediterránea",
+            retroalimentacion: "Algunas teorías ubican la Atlántida cerca de Creta.",
+          },
+          {
+            enunciado: "¿Cómo se llamó el supuesto continente perdido en el Océano Índico?",
+            opciones: ["Lemuria", "Pangea", "Gondwana", "Hiperbórea"],
+            respuesta: "Lemuria",
+            retroalimentacion: "Lemuria fue una hipótesis del siglo XIX.",
+          },
+          {
+            enunciado: "¿Qué idea sostiene que la historia tiene ciclos repetidos?",
+            opciones: ["Teoría cíclica", "Teoría lineal", "Teoría del progreso", "Teoría del caos"],
+            respuesta: "Teoría cíclica",
+            retroalimentacion: "La teoría cíclica habla de repeticiones históricas.",
+          },
+          {
+            enunciado: "¿Qué ciudad perdida se asocia con un mito de oro en Sudamérica?",
+            opciones: ["El Dorado", "Troya", "Pompeya", "Mohenjo-Daro"],
+            respuesta: "El Dorado",
+            retroalimentacion: "El Dorado es un mito de riqueza legendaria.",
+          },
+          {
+            enunciado: "¿Qué enigma histórico rodea a la Biblioteca de Alejandría?",
+            opciones: ["Su destrucción", "Su fundación", "Su traslado", "Su reconstrucción"],
+            respuesta: "Su destrucción",
+            retroalimentacion: "Se debate cómo y cuándo fue destruida.",
+          },
+        ];
+        return especiales[Math.floor(Math.random() * especiales.length)];
+      }
+
+      function iniciarTemporizador() {
+        detenerTemporizador();
+        etiquetaTiempo.textContent = estado.tiempoRestante;
+        temporizador = setInterval(() => {
+          estado.tiempoRestante -= 1;
+          etiquetaTiempo.textContent = estado.tiempoRestante;
+          if (estado.tiempoRestante <= 0) {
+            detenerTemporizador();
+            estado.vidas = 0;
+            perderPartida("Se acabó el tiempo.");
+          }
+        }, 1000);
+      }
+
+      function detenerTemporizador() {
+        if (temporizador) {
+          clearInterval(temporizador);
+          temporizador = null;
+        }
+      }
+
+      function perderPartida(mensaje) {
+        estado.vidas = 0;
+        textoPregunta.textContent = "Partida perdida.";
+        contenedorOpciones.innerHTML = "";
+        textoFeedback.textContent = `${mensaje} Debes empezar de cero.`;
+        estado.indicePreguntaActual = 0;
+        estado.puntaje = 0;
+        estado.ordenPreguntas = obtenerOrdenAleatorio(
+          estado.categorias[estado.indiceCategoriaActual].preguntas.length
+        );
+        estado.comodines = { pista: true, saltar: true, investigar: true };
+        detenerTemporizador();
+        actualizarEstado();
+        actualizarComodines();
+        guardarPartida();
+      }
+
+      function actualizarComodines() {
+        botonPista.disabled = !estado.comodines.pista;
+        botonSaltar.disabled = !estado.comodines.saltar;
+        botonInvestigar.disabled = !estado.comodines.investigar;
+      }
+
+      function usarComodinPista() {
+        if (!estado.comodines.pista) {
+          return;
+        }
+        const categoria = estado.categorias[estado.indiceCategoriaActual];
+        const respuesta = estado.preguntaActual?.respuesta ?? "";
+        const pista = `Pista: piensa en la categoría ${categoria.nombre} y la respuesta inicia con \"${respuesta[0]}\".`;
+        textoFeedback.textContent = pista;
+        estado.comodines.pista = false;
+        actualizarComodines();
+        guardarPartida();
+      }
+
+      function usarComodinSaltar() {
+        if (!estado.comodines.saltar) {
+          return;
+        }
+        estado.comodines.saltar = false;
+        estado.indicePreguntaActual += 1;
+        actualizarComodines();
+        actualizarPregunta();
+        guardarPartida();
+      }
+
+      function usarComodinInvestigar() {
+        if (!estado.comodines.investigar) {
+          return;
+        }
+        estado.comodines.investigar = false;
+        estado.permitirSalidaHasta = Date.now() + 10000;
+        actualizarComodines();
+        estadoGuardado.textContent = "Puedes salir 10 segundos para investigar.";
+        guardarPartida();
+      }
+
+      function gestionarSalidaVentana() {
+        if (document.hidden) {
+          if (Date.now() > estado.permitirSalidaHasta) {
+            perderPartida("Saliste de la pestaña sin comodín.");
+          } else {
+            setTimeout(() => {
+              if (document.hidden && Date.now() > estado.permitirSalidaHasta) {
+                perderPartida("No regresaste a tiempo.");
+              }
+            }, 11000);
+          }
+        }
+      }
+
       function enlazarMenu() {
         document.querySelectorAll("[data-action]").forEach((boton) => {
           boton.addEventListener("click", () => {
@@ -1176,12 +1375,17 @@
         estadoGuardado = document.getElementById("estadoGuardado");
         entradaNombre = document.getElementById("nombreGuardado");
         listaGuardados = document.getElementById("listaGuardados");
+        etiquetaTiempo = document.getElementById("tiempoRestante");
+        botonPista = document.getElementById("comodinPista");
+        botonSaltar = document.getElementById("comodinSaltar");
+        botonInvestigar = document.getElementById("comodinInvestigar");
 
         renderizarCategorias();
         enlazarMenu();
         estado.ordenPreguntas = obtenerOrdenAleatorio(estado.categorias[0].preguntas.length);
         actualizarJuego();
         renderizarGuardados();
+        actualizarComodines();
 
         if (window.gsap) {
           gsap.from(".animar-entrada", {
@@ -1192,6 +1396,11 @@
             ease: "power2.out",
           });
         }
+
+        botonPista.addEventListener("click", usarComodinPista);
+        botonSaltar.addEventListener("click", usarComodinSaltar);
+        botonInvestigar.addEventListener("click", usarComodinInvestigar);
+        document.addEventListener("visibilitychange", gestionarSalidaVentana);
       });
     </script>
   </body>

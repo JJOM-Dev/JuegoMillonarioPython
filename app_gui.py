@@ -697,6 +697,13 @@ class AplicacionJuego:
         self.vidas = 3
         self.puntaje = 0
         self.orden_preguntas: list[int] = []
+        self.tiempo_limite = 30
+        self.tiempo_restante = 30
+        self.pregunta_especial = False
+        self.pregunta_actual: Pregunta | None = None
+        self.temporizador_id: str | None = None
+        self.comodines = {"pista": True, "saltar": True, "investigar": True}
+        self.permitir_salida_hasta: float = 0.0
 
         self.particulas_confeti: list[tuple[int, int, int, int, str]] = []
 
@@ -704,6 +711,8 @@ class AplicacionJuego:
         self._construir_interfaz()
         self._actualizar_panel()
         self._renderizar_guardados()
+        self.raiz.bind("<FocusOut>", self._gestionar_salida)
+        self.raiz.bind("<Unmap>", self._gestionar_salida)
 
     def _configurar_estilos(self) -> None:
         estilo = ttk.Style()
@@ -791,6 +800,8 @@ class AplicacionJuego:
         self.etiqueta_vidas.pack(side="left", padx=10, pady=8)
         self.etiqueta_puntaje = ttk.Label(self.panel_estadisticas, text="Puntaje: 0", style="Texto.TLabel")
         self.etiqueta_puntaje.pack(side="left", padx=10, pady=8)
+        self.etiqueta_tiempo = ttk.Label(self.panel_estadisticas, text="Tiempo: 30s", style="Texto.TLabel")
+        self.etiqueta_tiempo.pack(side="left", padx=10, pady=8)
 
         self.tarjeta_pregunta = ttk.Frame(self.columna_juego, style="Tarjeta.TFrame")
         self.tarjeta_pregunta.pack(fill="x", padx=20, pady=16)
@@ -803,6 +814,27 @@ class AplicacionJuego:
 
         self.retroalimentacion = ttk.Label(self.columna_juego, text="", style="Texto.TLabel")
         self.retroalimentacion.pack(anchor="w", padx=20)
+
+        self.panel_comodines = ttk.Frame(self.columna_juego, style="Tarjeta.TFrame")
+        self.panel_comodines.pack(fill="x", padx=20, pady=(8, 0))
+        ttk.Button(
+            self.panel_comodines,
+            text="Comodín: Pista",
+            style="BotonSecundario.TButton",
+            command=self.usar_comodin_pista,
+        ).pack(side="left", padx=4, pady=6)
+        ttk.Button(
+            self.panel_comodines,
+            text="Comodín: Saltar",
+            style="BotonSecundario.TButton",
+            command=self.usar_comodin_saltar,
+        ).pack(side="left", padx=4, pady=6)
+        ttk.Button(
+            self.panel_comodines,
+            text="Comodín: Investigar 10s",
+            style="BotonSecundario.TButton",
+            command=self.usar_comodin_investigar,
+        ).pack(side="left", padx=4, pady=6)
 
         self.lienzo_confeti = tk.Canvas(self.columna_juego, height=120, bg="#ffffff", highlightthickness=0)
         self.lienzo_confeti.pack(fill="x", padx=20, pady=(12, 16))
@@ -832,18 +864,22 @@ class AplicacionJuego:
         self.etiqueta_nivel.config(text="Reto activo")
         self.etiqueta_vidas.config(text=f"Vidas: {self.vidas}")
         self.etiqueta_puntaje.config(text=f"Puntaje: {self.puntaje}")
+        self.etiqueta_tiempo.config(text=f"Tiempo: {self.tiempo_restante}s")
 
         if self.indice_pregunta >= len(categoria.preguntas):
             self.texto_pregunta.config(text="¡Categoría completada!")
             self.retroalimentacion.config(text="Excelente trabajo. Puedes elegir otra categoría.")
             for widget in self.marco_opciones.winfo_children():
                 widget.destroy()
+            self._detener_temporizador()
             return
 
         indice_real = self.orden_preguntas[self.indice_pregunta]
-        pregunta = categoria.preguntas[indice_real]
+        pregunta = self._seleccionar_pregunta(categoria, indice_real)
+        self.pregunta_actual = pregunta
         self.texto_pregunta.config(text=pregunta.enunciado)
         self.retroalimentacion.config(text="Selecciona la opción correcta.")
+        self._iniciar_temporizador()
 
         for widget in self.marco_opciones.winfo_children():
             widget.destroy()
@@ -855,22 +891,162 @@ class AplicacionJuego:
                 style="BotonSecundario.TButton",
                 command=lambda op=opcion: self.responder(op),
             ).pack(side="left", padx=4, pady=4)
+        self._actualizar_comodines()
+
+    def _seleccionar_pregunta(self, categoria: Categoria, indice_real: int) -> Pregunta:
+        es_especial = random.randint(1, 10) == 1
+        self.pregunta_especial = es_especial
+        if es_especial:
+            self.tiempo_limite = 10
+            self.tiempo_restante = 10
+            return self._obtener_pregunta_especial(categoria.nombre)
+        self.tiempo_limite = 30
+        self.tiempo_restante = 30
+        return categoria.preguntas[indice_real]
+
+    def _obtener_pregunta_especial(self, categoria: str) -> Pregunta:
+        banco = {
+            "Antigüedad": [
+                Pregunta(
+                    "¿Qué mito habla de una isla avanzada que desapareció en el mar?",
+                    ["Atlántida", "Lemuria", "Pangea", "Hiperbórea"],
+                    "Atlántida",
+                    "Atlántida es una leyenda antigua.",
+                )
+            ],
+            "Edad Media": [
+                Pregunta(
+                    "¿Qué objeto sagrado se buscaba en leyendas medievales?",
+                    ["Santo Grial", "Piedra Filosofal", "Arca de Noé", "Cáliz de Oro"],
+                    "Santo Grial",
+                    "El Santo Grial es un mito medieval.",
+                )
+            ],
+            "Renacimiento": [
+                Pregunta(
+                    "¿Qué personaje es famoso por el misterio de su sonrisa en una pintura?",
+                    ["Mona Lisa", "David", "Venus", "Dama del Armiño"],
+                    "Mona Lisa",
+                    "La sonrisa de la Mona Lisa es enigmática.",
+                )
+            ],
+            "Revoluciones": [
+                Pregunta(
+                    "¿Qué consigna se asocia con la Revolución Francesa?",
+                    ["Libertad, igualdad, fraternidad", "Orden y progreso", "Paz y trabajo", "Fe y patria"],
+                    "Libertad, igualdad, fraternidad",
+                    "Es una consigna histórica de la época.",
+                )
+            ],
+            "Siglo XX": [
+                Pregunta(
+                    "¿Qué fenómeno se relaciona con teorías del siglo XX sobre objetos voladores?",
+                    ["OVNIs", "Hiperbórea", "Atlántida", "Roswell es mito"],
+                    "OVNIs",
+                    "Los OVNIs protagonizan teorías modernas.",
+                )
+            ],
+        }
+        return random.choice(banco.get(categoria, banco["Antigüedad"]))
+
+    def _iniciar_temporizador(self) -> None:
+        self._detener_temporizador()
+        self.etiqueta_tiempo.config(text=f"Tiempo: {self.tiempo_restante}s")
+        self.temporizador_id = self.raiz.after(1000, self._actualizar_temporizador)
+
+    def _actualizar_temporizador(self) -> None:
+        self.tiempo_restante -= 1
+        self.etiqueta_tiempo.config(text=f"Tiempo: {self.tiempo_restante}s")
+        if self.tiempo_restante <= 0:
+            self._tiempo_agotado()
+            return
+        self.temporizador_id = self.raiz.after(1000, self._actualizar_temporizador)
+
+    def _detener_temporizador(self) -> None:
+        if self.temporizador_id:
+            self.raiz.after_cancel(self.temporizador_id)
+            self.temporizador_id = None
+
+    def _tiempo_agotado(self) -> None:
+        self._detener_temporizador()
+        self._perder_partida("Se acabó el tiempo.")
+
+    def _perder_partida(self, mensaje: str) -> None:
+        self.vidas = 0
+        self.puntaje = 0
+        self.indice_pregunta = 0
+        self.orden_preguntas = list(range(len(self.categorias[self.indice_categoria].preguntas)))
+        random.shuffle(self.orden_preguntas)
+        self.comodines = {"pista": True, "saltar": True, "investigar": True}
+        self.retroalimentacion.config(text=f"{mensaje} Debes empezar de cero.")
+        self._actualizar_comodines()
+        self._detener_temporizador()
+        self._guardar_automatico()
+        self._actualizar_panel()
+
+    def _actualizar_comodines(self) -> None:
+        for boton, disponible in zip(self.panel_comodines.winfo_children(), self.comodines.values()):
+            boton.configure(state="normal" if disponible else "disabled")
+
+    def usar_comodin_pista(self) -> None:
+        if not self.comodines["pista"] or not self.pregunta_actual:
+            return
+        pista = f"Pista: la respuesta inicia con \"{self.pregunta_actual.respuesta[0]}\"."
+        self.retroalimentacion.config(text=pista)
+        self.comodines["pista"] = False
+        self._actualizar_comodines()
+        self._guardar_automatico()
+
+    def usar_comodin_saltar(self) -> None:
+        if not self.comodines["saltar"]:
+            return
+        self.comodines["saltar"] = False
+        self.indice_pregunta += 1
+        self._actualizar_comodines()
+        self._actualizar_panel()
+        self._guardar_automatico()
+
+    def usar_comodin_investigar(self) -> None:
+        if not self.comodines["investigar"]:
+            return
+        self.comodines["investigar"] = False
+        self.permitir_salida_hasta = datetime.now().timestamp() + 10
+        self.estado_guardado.config(text="Puedes salir 10 segundos para investigar.")
+        self._actualizar_comodines()
+        self._guardar_automatico()
+
+    def _gestionar_salida(self, _evento: tk.Event) -> None:
+        ahora = datetime.now().timestamp()
+        if ahora > self.permitir_salida_hasta:
+            self._perder_partida("Saliste de la ventana sin comodín.")
+        else:
+            self.raiz.after(11000, self._comprobar_regreso)
+
+    def _comprobar_regreso(self) -> None:
+        if not self.raiz.focus_displayof():
+            self._perder_partida("No regresaste a tiempo.")
 
     def responder(self, opcion: str) -> None:
-        categoria = self.categorias[self.indice_categoria]
-        pregunta = categoria.preguntas[self.indice_pregunta]
-        if opcion == pregunta.respuesta:
+        if not self.pregunta_actual:
+            return
+        self._detener_temporizador()
+        if opcion == self.pregunta_actual.respuesta:
             self.puntaje += 10
-            self.retroalimentacion.config(text=f"✅ {pregunta.retroalimentacion}")
+            self.retroalimentacion.config(text=f"✅ {self.pregunta_actual.retroalimentacion}")
             self._lanzar_confeti()
+            if self.pregunta_especial:
+                self.vidas += 1
+                self.retroalimentacion.config(text=f"✅ {self.pregunta_actual.retroalimentacion} ¡Ganaste una vida!")
         else:
             self.vidas -= 1
-            self.retroalimentacion.config(text=f"❌ {pregunta.retroalimentacion} Te quedan {self.vidas} vidas.")
+            self.retroalimentacion.config(
+                text=f"❌ {self.pregunta_actual.retroalimentacion} Te quedan {self.vidas} vidas."
+            )
 
-        self._actualizar_panel()
         self.indice_pregunta += 1
         if self.vidas <= 0:
-            messagebox.showinfo("Fin del juego", "Has perdido todas las vidas. Puedes intentarlo de nuevo.")
+            self._perder_partida("Has perdido todas las vidas.")
+            return
         self._guardar_automatico()
         self._actualizar_panel()
 
@@ -881,6 +1057,7 @@ class AplicacionJuego:
         self.puntaje = 0
         self.orden_preguntas = list(range(len(self.categorias[indice].preguntas)))
         random.shuffle(self.orden_preguntas)
+        self.comodines = {"pista": True, "saltar": True, "investigar": True}
         self._actualizar_panel()
         self._guardar_automatico()
 
@@ -891,6 +1068,7 @@ class AplicacionJuego:
         self.puntaje = 0
         self.orden_preguntas = list(range(len(self.categorias[0].preguntas)))
         random.shuffle(self.orden_preguntas)
+        self.comodines = {"pista": True, "saltar": True, "investigar": True}
         self._actualizar_panel()
         self._guardar_automatico()
 
@@ -921,6 +1099,10 @@ class AplicacionJuego:
                 "vidas": self.vidas,
                 "puntaje": self.puntaje,
                 "orden_preguntas": self.orden_preguntas,
+                "tiempo_limite": self.tiempo_limite,
+                "tiempo_restante": self.tiempo_restante,
+                "pregunta_especial": self.pregunta_especial,
+                "comodines": self.comodines,
             },
         }
         guardados = [g for g in guardados if g["nombre"] != nombre]
@@ -953,6 +1135,10 @@ class AplicacionJuego:
         self.orden_preguntas = estado.get(
             "orden_preguntas", list(range(len(self.categorias[self.indice_categoria].preguntas)))
         )
+        self.tiempo_limite = estado.get("tiempo_limite", 30)
+        self.tiempo_restante = estado.get("tiempo_restante", 30)
+        self.pregunta_especial = estado.get("pregunta_especial", False)
+        self.comodines = estado.get("comodines", {"pista": True, "saltar": True, "investigar": True})
         self.entrada_nombre.delete(0, tk.END)
         self.entrada_nombre.insert(0, registro["nombre"])
         self.estado_guardado.config(text=f"Partida cargada: {registro['nombre']}")
