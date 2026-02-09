@@ -120,3 +120,16 @@ python main.py
 ```
 
 El juego guardará tu progreso en `savegame.json`.
+
+## Interfaz web
+Para una interfaz moderna, responsive y con estilo Neumorphism puedes abrir el archivo `index.html` en tu navegador.
+
+```bash
+# Opción simple
+open index.html
+
+# Servidor local con Python
+python -m http.server 8000
+```
+
+Luego visita `http://localhost:8000` en el navegador.
