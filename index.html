@@ -10,375 +10,30 @@
       href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-  </head>
-  <body>
-    <div class="app">
-      <header class="hero">
-        <div>
-          <p class="hero__eyebrow">Juego Educativo</p>
-          <h1>Historia Universal</h1>
-          <p class="hero__subtitle">
-            Vive los períodos históricos con retos dinámicos, feedback inmediato y
-            progreso guardado.
-          </p>
-        </div>
-        <div class="hero__badge">
-          <span>Daniel Rivera · José Osorio · Nelson Carrillo</span>
-        </div>
-      </header>
-
-      <section class="layout">
-        <aside class="card menu">
-          <h2>Menú Principal</h2>
-          <button class="btn btn--primary" data-action="new">Nueva partida</button>
-          <button class="btn" data-action="resume">Cargar partida</button>
-          <button class="btn btn--ghost" data-action="scores">Puntajes</button>
-          <div class="menu__status" id="saveStatus">
-            No hay partida guardada.
-          </div>
-        </aside>
-
-        <main class="card game">
-          <div class="game__header">
-            <div>
-              <p class="game__period" id="periodLabel">Selecciona un período</p>
-              <h2 id="levelLabel">Nivel actual</h2>
-            </div>
-            <div class="game__stats">
-              <div>
-                <span>Vidas</span>
-                <strong id="lives">3</strong>
-              </div>
-              <div>
-                <span>Puntaje</span>
-                <strong id="score">0</strong>
-              </div>
-            </div>
-          </div>
-
-          <div class="question" id="questionCard">
-            <p class="question__text" id="questionText">
-              Selecciona una opción para comenzar el reto histórico.
-            </p>
-            <div class="question__options" id="options"></div>
-          </div>
-
-          <div class="feedback" id="feedback">
-            <span class="feedback__icon">🧭</span>
-            <p id="feedbackText">Elige un reto para iniciar.</p>
-          </div>
-        </main>
-      </section>
-
-      <section class="card timeline">
-        <h2>Períodos Disponibles</h2>
-        <div class="timeline__grid" id="periods"></div>
-      </section>
-
-      <section class="card team">
-        <h2>Integrantes</h2>
-        <ul class="team__list">
-          <li>
-            <strong>Daniel Rivera</strong>
-            <span>C.I: 31.048.830</span>
-          </li>
-          <li>
-            <strong>José Osorio</strong>
-            <span>C.I: 30.973.057</span>
-          </li>
-          <li>
-            <strong>Nelson Carrillo</strong>
-            <span>C.I: 31.611.962</span>
-          </li>
-        </ul>
-      </section>
-    </div>
-
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      /* ===========================
-         Diseño neumórfico global
-         =========================== */
       :root {
         color-scheme: light;
-        --bg: #eef1f7;
-        --surface: #eef1f7;
-        --surface-raised: #f7f9ff;
-        --shadow-dark: #c8cedc;
-        --shadow-light: #ffffff;
-        --accent: #5f6bff;
-        --accent-soft: #dfe4ff;
-        --text: #1f2430;
-        --muted: #687080;
-      }
-
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: "Montserrat", sans-serif;
       }
 
       body {
-        background: var(--bg);
-        color: var(--text);
-        min-height: 100vh;
-        padding: 32px;
+        font-family: "Montserrat", sans-serif;
       }
 
-      .app {
-        display: flex;
-        flex-direction: column;
-        gap: 28px;
-        max-width: 1200px;
-        margin: 0 auto;
-      }
-
-      .hero {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 28px 32px;
-        border-radius: 26px;
-        background: var(--surface);
-        box-shadow: 16px 16px 32px var(--shadow-dark), -16px -16px 32px var(--shadow-light);
-      }
-
-      .hero h1 {
-        font-size: clamp(2.2rem, 4vw, 3.2rem);
-        margin-bottom: 8px;
-      }
-
-      .hero__eyebrow {
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        font-weight: 600;
-        color: var(--muted);
-        font-size: 0.75rem;
-        margin-bottom: 6px;
-      }
-
-      .hero__subtitle {
-        color: var(--muted);
-        max-width: 480px;
-      }
-
-      .hero__badge {
-        background: var(--surface-raised);
-        padding: 18px 22px;
-        border-radius: 22px;
-        box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
-        font-weight: 600;
-        color: var(--accent);
+      .anim-flotar {
         animation: flotar 3s ease-in-out infinite;
       }
 
-      .layout {
-        display: grid;
-        grid-template-columns: minmax(220px, 280px) 1fr;
-        gap: 24px;
+      .anim-aparecer {
+        animation: aparecer 0.5s ease;
       }
 
-      .card {
-        background: var(--surface);
-        border-radius: 26px;
-        padding: 24px;
-        box-shadow: 14px 14px 28px var(--shadow-dark), -14px -14px 28px var(--shadow-light);
+      .anim-correcto {
+        animation: correcto 0.9s ease;
       }
 
-      .menu {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      .menu h2 {
-        font-size: 1.3rem;
-      }
-
-      .menu__status {
-        margin-top: auto;
-        font-size: 0.85rem;
-        color: var(--muted);
-      }
-
-      .btn {
-        border: none;
-        padding: 14px 18px;
-        border-radius: 16px;
-        background: var(--surface);
-        box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
-        cursor: pointer;
-        font-weight: 600;
-        color: var(--text);
-        transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-      }
-
-      .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
-        filter: brightness(1.02);
-      }
-
-      .btn--primary {
-        background: var(--accent);
-        color: white;
-        box-shadow: 8px 8px 16px rgba(95, 107, 255, 0.35), -8px -8px 16px var(--shadow-light);
-      }
-
-      .btn--ghost {
-        background: var(--surface-raised);
-      }
-
-      .game {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-      }
-
-      .game__header {
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        flex-wrap: wrap;
-      }
-
-      .game__period {
-        color: var(--muted);
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-      }
-
-      .game__stats {
-        display: flex;
-        gap: 20px;
-        font-size: 0.9rem;
-      }
-
-      .game__stats div {
-        background: var(--surface-raised);
-        padding: 10px 14px;
-        border-radius: 14px;
-        box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
-        text-align: center;
-        min-width: 90px;
-        transition: transform 0.2s ease;
-      }
-
-      .game__stats div:hover {
-        transform: translateY(-2px);
-      }
-
-      .question {
-        background: var(--surface-raised);
-        border-radius: 20px;
-        padding: 20px;
-        box-shadow: inset 8px 8px 16px var(--shadow-dark), inset -8px -8px 16px var(--shadow-light);
-        animation: aparecer-suave 0.5s ease;
-      }
-
-      .question__text {
-        font-size: 1.05rem;
-        margin-bottom: 18px;
-      }
-
-      .question__options {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 12px;
-      }
-
-      .option {
-        padding: 12px 16px;
-        border-radius: 14px;
-        background: var(--surface);
-        box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-weight: 600;
-        text-align: left;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .option:hover {
-        transform: translateY(-2px);
-        box-shadow: 4px 4px 12px rgba(95, 107, 255, 0.25), -4px -4px 12px var(--shadow-light);
-      }
-
-      .option--correct {
-        background: #d7f5df;
-        color: #1c6b37;
-        animation: resplandor-correcto 0.9s ease;
-      }
-
-      .option--wrong {
-        background: #ffe0e0;
-        color: #8a2222;
-        animation: sacudir-error 0.5s ease;
-      }
-
-      .feedback {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 16px;
-        border-radius: 18px;
-        background: var(--surface);
-        box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
-      }
-
-      .feedback__icon {
-        font-size: 1.4rem;
-      }
-
-      .feedback {
-        animation: aparecer-suave 0.4s ease;
-      }
-
-      @keyframes resplandor-correcto {
-        0% {
-          transform: scale(1);
-          box-shadow: 0 0 0 rgba(40, 200, 120, 0.4);
-        }
-        50% {
-          transform: scale(1.02);
-          box-shadow: 0 0 18px rgba(40, 200, 120, 0.6);
-        }
-        100% {
-          transform: scale(1);
-          box-shadow: 0 0 0 rgba(40, 200, 120, 0.3);
-        }
-      }
-
-      @keyframes sacudir-error {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        20% {
-          transform: translateX(-6px);
-        }
-        40% {
-          transform: translateX(6px);
-        }
-        60% {
-          transform: translateX(-4px);
-        }
-        80% {
-          transform: translateX(4px);
-        }
-      }
-
-      @keyframes aparecer-suave {
-        0% {
-          opacity: 0;
-          transform: translateY(6px);
-        }
-        100% {
-          opacity: 1;
-          transform: translateY(0);
-        }
+      .anim-error {
+        animation: error 0.5s ease;
       }
 
       @keyframes flotar {
@@ -391,92 +46,153 @@
         }
       }
 
-      .timeline {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      .timeline__grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-        gap: 16px;
-      }
-
-      .period {
-        padding: 16px;
-        border-radius: 18px;
-        background: var(--surface);
-        box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-
-      .period span {
-        color: var(--muted);
-        font-size: 0.85rem;
-      }
-
-      .period:hover {
-        transform: translateY(-3px);
-        box-shadow: 4px 4px 12px rgba(95, 107, 255, 0.2), -4px -4px 12px var(--shadow-light);
-      }
-
-      .team__list {
-        list-style: none;
-        display: grid;
-        gap: 12px;
-      }
-
-      .team__list li {
-        padding: 12px 16px;
-        border-radius: 16px;
-        background: var(--surface);
-        box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        transition: transform 0.2s ease;
-      }
-
-      .team__list li:hover {
-        transform: translateY(-2px);
-      }
-
-      .team__list span {
-        color: var(--muted);
-        font-size: 0.85rem;
-      }
-
-      @media (max-width: 900px) {
-        body {
-          padding: 20px;
+      @keyframes aparecer {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
         }
-
-        .layout {
-          grid-template-columns: 1fr;
-        }
-
-        .hero {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 16px;
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
       }
 
-      @media (max-width: 600px) {
-        .hero {
-          padding: 22px;
+      @keyframes correcto {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 0 rgba(34, 197, 94, 0.4);
         }
+        50% {
+          transform: scale(1.02);
+          box-shadow: 0 0 20px rgba(34, 197, 94, 0.55);
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 rgba(34, 197, 94, 0.25);
+        }
+      }
 
-        .card {
-          padding: 20px;
+      @keyframes error {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-6px);
+        }
+        50% {
+          transform: translateX(6px);
+        }
+        75% {
+          transform: translateX(-4px);
         }
       }
     </style>
+  </head>
+  <body class="bg-slate-100 text-slate-900">
+    <div class="mx-auto flex min-h-screen max-w-6xl flex-col gap-8 px-4 py-8">
+      <header class="rounded-3xl bg-white/80 p-8 shadow-xl backdrop-blur">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Juego educativo</p>
+            <h1 class="mt-2 text-4xl font-bold text-slate-900 md:text-5xl">Historia Universal</h1>
+            <p class="mt-3 max-w-xl text-slate-500">
+              Vive los períodos históricos con retos dinámicos, feedback inmediato y progreso guardado.
+            </p>
+          </div>
+          <div
+            class="anim-flotar rounded-2xl bg-gradient-to-r from-indigo-500 via-blue-500 to-sky-400 px-6 py-4 text-sm font-semibold text-white shadow-lg"
+          >
+            Daniel Rivera · José Osorio · Nelson Carrillo
+          </div>
+        </div>
+      </header>
+
+      <section class="grid gap-6 lg:grid-cols-[260px,1fr]">
+        <aside class="rounded-3xl bg-white p-6 shadow-lg">
+          <h2 class="text-lg font-semibold text-slate-800">Menú Principal</h2>
+          <div class="mt-4 flex flex-col gap-3">
+            <button
+              class="rounded-2xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-indigo-400"
+              data-action="new"
+            >
+              Nueva partida
+            </button>
+            <button
+              class="rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5"
+              data-action="resume"
+            >
+              Cargar partida
+            </button>
+            <button
+              class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 shadow-sm transition hover:-translate-y-0.5"
+              data-action="scores"
+            >
+              Puntajes
+            </button>
+          </div>
+          <p class="mt-6 text-xs font-medium text-slate-400" id="saveStatus">No hay partida guardada.</p>
+        </aside>
+
+        <main class="rounded-3xl bg-white p-6 shadow-lg">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400" id="periodLabel">
+                Selecciona una categoría
+              </p>
+              <h2 class="mt-1 text-2xl font-semibold text-slate-800" id="levelLabel">Reto actual</h2>
+            </div>
+            <div class="flex gap-3">
+              <div class="rounded-2xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-500 shadow-sm">
+                Vidas <span class="ml-1 text-slate-700" id="lives">3</span>
+              </div>
+              <div class="rounded-2xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-500 shadow-sm">
+                Puntaje <span class="ml-1 text-slate-700" id="score">0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="anim-aparecer mt-6 rounded-3xl bg-slate-50 p-6 shadow-inner" id="questionCard">
+            <p class="text-base font-medium text-slate-700" id="questionText">
+              Selecciona una opción para comenzar el reto histórico.
+            </p>
+            <div class="mt-4 grid gap-3 sm:grid-cols-2" id="options"></div>
+          </div>
+
+          <div class="anim-aparecer mt-4 flex items-center gap-3 rounded-3xl bg-slate-50 p-4 shadow-inner" id="feedback">
+            <span class="text-lg">✨</span>
+            <p class="text-sm text-slate-600" id="feedbackText">Elige un reto para iniciar.</p>
+          </div>
+        </main>
+      </section>
+
+      <section class="rounded-3xl bg-white p-6 shadow-lg">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h2 class="text-lg font-semibold text-slate-800">Categorías Disponibles</h2>
+          <p class="text-xs text-slate-400">Explora mínimo 5 categorías con 20+ preguntas cada una.</p>
+        </div>
+        <div class="mt-4 grid gap-4 md:grid-cols-3" id="periods"></div>
+      </section>
+
+      <section class="rounded-3xl bg-white p-6 shadow-lg">
+        <h2 class="text-lg font-semibold text-slate-800">Integrantes</h2>
+        <div class="mt-4 grid gap-3 md:grid-cols-3">
+          <div class="rounded-2xl bg-slate-50 p-4 shadow-inner">
+            <p class="font-semibold text-slate-700">Daniel Rivera</p>
+            <p class="text-xs text-slate-400">C.I: 31.048.830</p>
+          </div>
+          <div class="rounded-2xl bg-slate-50 p-4 shadow-inner">
+            <p class="font-semibold text-slate-700">José Osorio</p>
+            <p class="text-xs text-slate-400">C.I: 30.973.057</p>
+          </div>
+          <div class="rounded-2xl bg-slate-50 p-4 shadow-inner">
+            <p class="font-semibold text-slate-700">Nelson Carrillo</p>
+            <p class="text-xs text-slate-400">C.I: 31.611.962</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
     <script>
       /*
         ============================================================
@@ -487,175 +203,654 @@
         ============================================================
       */
 
-      // Clave del almacenamiento local para guardar progreso.
       const CLAVE_GUARDADO = "historia-save";
 
-      // Estado principal del juego (periodos, vidas, puntaje, etc.).
       const estado = {
-        periodos: [
+        categorias: [
           {
             nombre: "Antigüedad",
-            descripcion: "Civilizaciones iniciales y aportes culturales.",
-            nivel: {
-              nombre: "Civilizaciones Iniciales",
-              preguntas: [
-                {
-                  enunciado: "¿Cuál de estas civilizaciones se desarrolló junto al río Nilo?",
-                  opciones: ["Mesopotamia", "Egipto", "China", "Grecia"],
-                  respuesta: "Egipto",
-                  retroalimentacion: "Egipto se consolidó gracias a las crecidas del Nilo.",
-                },
-                {
-                  enunciado: "¿Qué invento permitió registrar leyes y comercio?",
-                  opciones: ["La escritura", "La brújula", "La pólvora", "La rueda"],
-                  respuesta: "La escritura",
-                  retroalimentacion: "La escritura impulsó la organización social.",
-                },
-                {
-                  enunciado: "¿En qué región surgió la civilización mesopotámica?",
-                  opciones: [
-                    "Entre los ríos Tigris y Éufrates",
-                    "En los Andes",
-                    "En el Sahara",
-                    "En la península Ibérica",
-                  ],
-                  respuesta: "Entre los ríos Tigris y Éufrates",
-                  retroalimentacion: "Mesopotamia significa literalmente \"entre ríos\".",
-                },
-                {
-                  enunciado: "¿Qué pueblo destacó por el comercio marítimo en el Mediterráneo?",
-                  opciones: ["Fenicios", "Mayas", "Aztecas", "Incas"],
-                  respuesta: "Fenicios",
-                  retroalimentacion: "Los fenicios fueron grandes navegantes y comerciantes.",
-                },
-                {
-                  enunciado: "¿Qué sistema político se desarrolló en Atenas?",
-                  opciones: ["Democracia", "Feudalismo", "Monarquía absoluta", "Teocracia"],
-                  respuesta: "Democracia",
-                  retroalimentacion: "Atenas es recordada por la democracia directa.",
-                },
-                {
-                  enunciado: "¿Qué imperio construyó la Vía Apia y otras calzadas famosas?",
-                  opciones: ["Imperio Romano", "Imperio Persa", "Imperio Chino", "Imperio Otomano"],
-                  respuesta: "Imperio Romano",
-                  retroalimentacion: "Roma expandió su red de calzadas para unir el imperio.",
-                },
-                {
-                  enunciado: "¿Cuál fue uno de los aportes científicos de los griegos?",
-                  opciones: ["Geometría", "Imprenta", "Electricidad", "Motor de combustión"],
-                  respuesta: "Geometría",
-                  retroalimentacion: "Euclides y otros griegos sistematizaron la geometría.",
-                },
-                {
-                  enunciado: "¿Qué río fue clave para la civilización del Indo?",
-                  opciones: ["Indo", "Amazonas", "Danubio", "Nilo"],
-                  respuesta: "Indo",
-                  retroalimentacion: "La civilización del Indo prosperó junto a ese río.",
-                },
-                {
-                  enunciado: "¿Qué imperio inició la construcción de la Gran Muralla?",
-                  opciones: ["China", "Roma", "Persia", "Egipto"],
-                  respuesta: "China",
-                  retroalimentacion: "La Gran Muralla fue construida por dinastías chinas.",
-                },
-                {
-                  enunciado: "¿Cuál fue la capital del Imperio Bizantino?",
-                  opciones: ["Constantinopla", "Roma", "Atenas", "Alejandría"],
-                  respuesta: "Constantinopla",
-                  retroalimentacion: "Constantinopla fue el centro del Imperio Bizantino.",
-                },
-              ],
-            },
+            descripcion: "Civilizaciones iniciales, ciencia y cultura.",
+            preguntas: [
+              {
+                enunciado: "¿Cuál de estas civilizaciones se desarrolló junto al río Nilo?",
+                opciones: ["Mesopotamia", "Egipto", "China", "Grecia"],
+                respuesta: "Egipto",
+                retroalimentacion: "Egipto creció gracias a las crecidas del Nilo.",
+              },
+              {
+                enunciado: "¿Qué invento permitió registrar leyes y comercio?",
+                opciones: ["La escritura", "La brújula", "La pólvora", "La rueda"],
+                respuesta: "La escritura",
+                retroalimentacion: "La escritura organizó la vida urbana.",
+              },
+              {
+                enunciado: "¿En qué región surgió Mesopotamia?",
+                opciones: [
+                  "Entre los ríos Tigris y Éufrates",
+                  "En los Andes",
+                  "En el Sahara",
+                  "En la península Ibérica",
+                ],
+                respuesta: "Entre los ríos Tigris y Éufrates",
+                retroalimentacion: "Mesopotamia significa 'entre ríos'.",
+              },
+              {
+                enunciado: "¿Qué pueblo destacó por su comercio marítimo?",
+                opciones: ["Fenicios", "Mayas", "Aztecas", "Incas"],
+                respuesta: "Fenicios",
+                retroalimentacion: "Los fenicios dominaron rutas comerciales.",
+              },
+              {
+                enunciado: "¿Qué sistema político se consolidó en Atenas?",
+                opciones: ["Democracia", "Feudalismo", "Teocracia", "Monarquía absoluta"],
+                respuesta: "Democracia",
+                retroalimentacion: "Atenas impulsó la democracia directa.",
+              },
+              {
+                enunciado: "¿Qué imperio construyó la Vía Apia?",
+                opciones: ["Imperio Romano", "Imperio Persa", "Imperio Chino", "Imperio Otomano"],
+                respuesta: "Imperio Romano",
+                retroalimentacion: "Roma expandió su red de calzadas.",
+              },
+              {
+                enunciado: "¿Cuál fue un aporte científico de los griegos?",
+                opciones: ["Geometría", "Imprenta", "Electricidad", "Motor de combustión"],
+                respuesta: "Geometría",
+                retroalimentacion: "Euclides destacó en geometría.",
+              },
+              {
+                enunciado: "¿Qué río fue clave para la civilización del Indo?",
+                opciones: ["Indo", "Amazonas", "Danubio", "Nilo"],
+                respuesta: "Indo",
+                retroalimentacion: "El Indo dio origen a esa civilización.",
+              },
+              {
+                enunciado: "¿Qué imperio inició la Gran Muralla?",
+                opciones: ["China", "Roma", "Persia", "Egipto"],
+                respuesta: "China",
+                retroalimentacion: "La Gran Muralla fue obra china.",
+              },
+              {
+                enunciado: "¿Cuál fue la capital del Imperio Bizantino?",
+                opciones: ["Constantinopla", "Roma", "Atenas", "Alejandría"],
+                respuesta: "Constantinopla",
+                retroalimentacion: "Constantinopla fue su centro político.",
+              },
+              {
+                enunciado: "¿Qué estructura monumental eran tumbas reales en Egipto?",
+                opciones: ["Pirámides", "Zigurats", "Anfiteatros", "Catedrales"],
+                respuesta: "Pirámides",
+                retroalimentacion: "Las pirámides guardaban a los faraones.",
+              },
+              {
+                enunciado: "¿Qué código legal es uno de los más antiguos?",
+                opciones: ["Código de Hammurabi", "Código Napoleónico", "Leyes de Indias", "Fuero Juzgo"],
+                respuesta: "Código de Hammurabi",
+                retroalimentacion: "Hammurabi dejó un código famoso.",
+              },
+              {
+                enunciado: "¿Qué invento chino revolucionó la navegación?",
+                opciones: ["Brújula", "Telescopio", "Imprenta", "Motor a vapor"],
+                respuesta: "Brújula",
+                retroalimentacion: "La brújula facilitó los viajes marítimos.",
+              },
+              {
+                enunciado: "¿Qué civilización construyó Machu Picchu?",
+                opciones: ["Inca", "Maya", "Azteca", "Olmeca"],
+                respuesta: "Inca",
+                retroalimentacion: "Machu Picchu es un legado inca.",
+              },
+              {
+                enunciado: "¿Qué río permitió el desarrollo de la India antigua?",
+                opciones: ["Ganges", "Nilo", "Tigris", "Éufrates"],
+                respuesta: "Ganges",
+                retroalimentacion: "El Ganges es sagrado y vital en India.",
+              },
+              {
+                enunciado: "¿Qué ciudad fue enterrada por el Vesubio?",
+                opciones: ["Pompeya", "Roma", "Cartago", "Atenas"],
+                respuesta: "Pompeya",
+                retroalimentacion: "Pompeya quedó sepultada en el año 79.",
+              },
+              {
+                enunciado: "¿Cuál era el lenguaje de la antigua Roma?",
+                opciones: ["Latín", "Griego", "Hebreo", "Árabe"],
+                respuesta: "Latín",
+                retroalimentacion: "El latín fue la lengua del Imperio Romano.",
+              },
+              {
+                enunciado: "¿Qué dios era principal en la mitología egipcia?",
+                opciones: ["Ra", "Zeus", "Odín", "Anubis"],
+                respuesta: "Ra",
+                retroalimentacion: "Ra era el dios del sol.",
+              },
+              {
+                enunciado: "¿Qué civilización levantó Stonehenge?",
+                opciones: ["Britanos antiguos", "Mayas", "Persas", "Chinos"],
+                respuesta: "Britanos antiguos",
+                retroalimentacion: "Stonehenge es una construcción megalítica.",
+              },
+              {
+                enunciado: "¿Cuál fue uno de los primeros alfabetos?",
+                opciones: ["Fenicio", "Latino", "Cirílico", "Hebreo"],
+                respuesta: "Fenicio",
+                retroalimentacion: "El alfabeto fenicio inspiró otros alfabetos.",
+              },
+            ],
           },
           {
-            nombre: "Independencia y Venezuela",
-            descripcion: "Campañas libertadoras y liderazgos clave.",
-            nivel: {
-              nombre: "Campañas Libertadoras",
-              preguntas: [
-                {
-                  enunciado: "¿Quién lideró la Campaña Admirable en 1813?",
-                  opciones: [
-                    "Simón Bolívar",
-                    "Francisco Miranda",
-                    "José de San Martín",
-                    "Antonio José de Sucre",
-                  ],
-                  respuesta: "Simón Bolívar",
-                  retroalimentacion: "La Campaña Admirable consolidó el liderazgo de Bolívar.",
-                },
-                {
-                  enunciado: "¿Qué batalla aseguró la independencia de Venezuela en 1821?",
-                  opciones: ["Carabobo", "Boyacá", "Junín", "Pichincha"],
-                  respuesta: "Carabobo",
-                  retroalimentacion: "Carabobo fue decisiva para la independencia venezolana.",
-                },
-                {
-                  enunciado: "¿Qué figura es conocida como la Libertadora del Libertador?",
-                  opciones: ["Manuela Sáenz", "Luisa Cáceres", "Juana Ramírez", "Josefa Camejo"],
-                  respuesta: "Manuela Sáenz",
-                  retroalimentacion: "Manuela Sáenz apoyó a Bolívar en momentos clave.",
-                },
-                {
-                  enunciado: "¿En qué ciudad se firmó el Acta de Independencia de Venezuela en 1811?",
-                  opciones: ["Caracas", "Valencia", "Maracaibo", "Cumaná"],
-                  respuesta: "Caracas",
-                  retroalimentacion: "El Acta se firmó en Caracas el 5 de julio de 1811.",
-                },
-                {
-                  enunciado: "¿Qué batalla lideró Antonio José de Sucre que aseguró la independencia de Ecuador?",
-                  opciones: ["Pichincha", "Junín", "Ayacucho", "Carabobo"],
-                  respuesta: "Pichincha",
-                  retroalimentacion: "La victoria de Pichincha fue clave en 1822.",
-                },
-                {
-                  enunciado: "¿Qué documento proclamó los derechos del hombre y del ciudadano en 1789?",
-                  opciones: [
-                    "Declaración de los Derechos del Hombre y del Ciudadano",
-                    "Carta Magna",
-                    "Constitución de Cádiz",
-                    "Edicto de Nantes",
-                  ],
-                  respuesta: "Declaración de los Derechos del Hombre y del Ciudadano",
-                  retroalimentacion: "Fue un texto fundamental de la Revolución Francesa.",
-                },
-                {
-                  enunciado: "¿Quién encabezó el proceso de independencia de Haití?",
-                  opciones: ["Toussaint Louverture", "Simón Bolívar", "Napoleón Bonaparte", "Bernardo O'Higgins"],
-                  respuesta: "Toussaint Louverture",
-                  retroalimentacion: "Louverture fue líder de la revolución haitiana.",
-                },
-                {
-                  enunciado: "¿Qué país lideró la Revolución Industrial?",
-                  opciones: ["Inglaterra", "España", "Portugal", "Rusia"],
-                  respuesta: "Inglaterra",
-                  retroalimentacion: "La Revolución Industrial inició en Inglaterra.",
-                },
-                {
-                  enunciado: "¿Qué conflicto inició en 1914 y se conoce como la Primera Guerra Mundial?",
-                  opciones: ["Gran Guerra", "Guerra de Crimea", "Guerra Fría", "Guerra de los Cien Años"],
-                  respuesta: "Gran Guerra",
-                  retroalimentacion: "La Primera Guerra Mundial también se llamó Gran Guerra.",
-                },
-                {
-                  enunciado: "¿Qué organización internacional surgió tras la Segunda Guerra Mundial?",
-                  opciones: ["ONU", "OTAN", "Unión Europea", "Liga Hanseática"],
-                  respuesta: "ONU",
-                  retroalimentacion: "La ONU se fundó en 1945 para promover la paz.",
-                },
-              ],
-            },
+            nombre: "Edad Media",
+            descripcion: "Feudos, religiones y expansión cultural.",
+            preguntas: [
+              {
+                enunciado: "¿Qué sistema social dominó Europa medieval?",
+                opciones: ["Feudalismo", "Capitalismo", "Socialismo", "Democracia"],
+                respuesta: "Feudalismo",
+                retroalimentacion: "El feudalismo estructuró la sociedad medieval.",
+              },
+              {
+                enunciado: "¿Qué ruta comercial conectaba Europa con Asia?",
+                opciones: ["Ruta de la Seda", "Ruta del Ámbar", "Ruta del Inca", "Ruta del Oro"],
+                respuesta: "Ruta de la Seda",
+                retroalimentacion: "La Ruta de la Seda unía Oriente y Occidente.",
+              },
+              {
+                enunciado: "¿Qué ciudad fue capital del Imperio Carolingio?",
+                opciones: ["Aquisgrán", "París", "Roma", "Londres"],
+                respuesta: "Aquisgrán",
+                retroalimentacion: "Carlomagno gobernó desde Aquisgrán.",
+              },
+              {
+                enunciado: "¿Qué institución religiosa tuvo gran poder en la Edad Media?",
+                opciones: ["Iglesia", "Senado", "Parlamento", "Gremios"],
+                respuesta: "Iglesia",
+                retroalimentacion: "La Iglesia fue central en la vida medieval.",
+              },
+              {
+                enunciado: "¿Cómo se llamaban las comunidades de artesanos?",
+                opciones: ["Gremios", "Tribus", "Senados", "Ligas"],
+                respuesta: "Gremios",
+                retroalimentacion: "Los gremios organizaban oficios urbanos.",
+              },
+              {
+                enunciado: "¿Qué conflicto enfrentó a cristianos y musulmanes en Tierra Santa?",
+                opciones: ["Cruzadas", "Reconquista", "Guerra de los Cien Años", "Guerra Fría"],
+                respuesta: "Cruzadas",
+                retroalimentacion: "Las cruzadas buscaron controlar Jerusalén.",
+              },
+              {
+                enunciado: "¿Qué imperio se expandió desde Constantinopla?",
+                opciones: ["Bizantino", "Mongol", "Inca", "Azteca"],
+                respuesta: "Bizantino",
+                retroalimentacion: "El Imperio Bizantino continuó a Roma.",
+              },
+              {
+                enunciado: "¿Qué civilización construyó la Alhambra?",
+                opciones: ["Musulmanes", "Visigodos", "Francos", "Vikingos"],
+                respuesta: "Musulmanes",
+                retroalimentacion: "La Alhambra es una joya andalusí.",
+              },
+              {
+                enunciado: "¿Qué pandemia asoló Europa en el siglo XIV?",
+                opciones: ["Peste Negra", "Gripe Española", "Viruela", "Cólera"],
+                respuesta: "Peste Negra",
+                retroalimentacion: "La Peste Negra redujo la población europea.",
+              },
+              {
+                enunciado: "¿Quién fue un líder vikingo famoso?",
+                opciones: ["Erik el Rojo", "Julio César", "Napoleón", "Alejandro"],
+                respuesta: "Erik el Rojo",
+                retroalimentacion: "Erik el Rojo exploró Groenlandia.",
+              },
+              {
+                enunciado: "¿Qué ciudad italiana fue un centro comercial medieval?",
+                opciones: ["Venecia", "Madrid", "Berlín", "Lisboa"],
+                respuesta: "Venecia",
+                retroalimentacion: "Venecia dominó rutas marítimas.",
+              },
+              {
+                enunciado: "¿Qué imperio se originó en la península arábiga?",
+                opciones: ["Islámico", "Inca", "Romano", "Chino"],
+                respuesta: "Islámico",
+                retroalimentacion: "El Islam se expandió rápidamente.",
+              },
+              {
+                enunciado: "¿Qué rey inglés firmó la Carta Magna?",
+                opciones: ["Juan Sin Tierra", "Enrique VIII", "Ricardo III", "Eduardo I"],
+                respuesta: "Juan Sin Tierra",
+                retroalimentacion: "La Carta Magna limitó al rey.",
+              },
+              {
+                enunciado: "¿Qué estilo arquitectónico se usó en catedrales medievales?",
+                opciones: ["Gótico", "Barroco", "Neoclásico", "Moderno"],
+                respuesta: "Gótico",
+                retroalimentacion: "El gótico destaca por sus vitrales.",
+              },
+              {
+                enunciado: "¿Qué territorio recuperaron los reinos cristianos en España?",
+                opciones: ["Al-Ándalus", "Borgoña", "Sicilia", "Baviera"],
+                respuesta: "Al-Ándalus",
+                retroalimentacion: "La Reconquista buscó recuperar Al-Ándalus.",
+              },
+              {
+                enunciado: "¿Qué documento definió leyes en el reino visigodo?",
+                opciones: ["Fuero Juzgo", "Código Napoleónico", "Doce Tablas", "Código Hammurabi"],
+                respuesta: "Fuero Juzgo",
+                retroalimentacion: "El Fuero Juzgo fue un código visigodo.",
+              },
+              {
+                enunciado: "¿Qué orden militar protegía peregrinos?",
+                opciones: ["Templarios", "Espartanos", "Samuráis", "Legionarios"],
+                respuesta: "Templarios",
+                retroalimentacion: "Los templarios fueron una orden militar.",
+              },
+              {
+                enunciado: "¿Qué ciudad fue arrasada por los mongoles en 1258?",
+                opciones: ["Bagdad", "Roma", "París", "El Cairo"],
+                respuesta: "Bagdad",
+                retroalimentacion: "Bagdad cayó ante los mongoles.",
+              },
+              {
+                enunciado: "¿Qué país vivió la Guerra de los Cien Años?",
+                opciones: ["Francia e Inglaterra", "España y Portugal", "Rusia y Suecia", "Alemania y Italia"],
+                respuesta: "Francia e Inglaterra",
+                retroalimentacion: "La guerra duró más de un siglo.",
+              },
+              {
+                enunciado: "¿Qué universidad medieval es una de las más antiguas?",
+                opciones: ["Bolonia", "Harvard", "Oxford", "Salamanca"],
+                respuesta: "Bolonia",
+                retroalimentacion: "Bolonia se fundó en el siglo XI.",
+              },
+            ],
+          },
+          {
+            nombre: "Renacimiento",
+            descripcion: "Arte, ciencia y exploraciones globales.",
+            preguntas: [
+              {
+                enunciado: "¿Qué artista pintó la Mona Lisa?",
+                opciones: ["Leonardo da Vinci", "Miguel Ángel", "Rafael", "Donatello"],
+                respuesta: "Leonardo da Vinci",
+                retroalimentacion: "Da Vinci creó la Mona Lisa.",
+              },
+              {
+                enunciado: "¿Qué invento permitió difundir libros masivamente?",
+                opciones: ["Imprenta", "Telescopio", "Brújula", "Motor"],
+                respuesta: "Imprenta",
+                retroalimentacion: "Gutenberg impulsó la imprenta.",
+              },
+              {
+                enunciado: "¿Qué ciudad italiana fue cuna del Renacimiento?",
+                opciones: ["Florencia", "Roma", "Venecia", "Milán"],
+                respuesta: "Florencia",
+                retroalimentacion: "Florencia fue epicentro cultural.",
+              },
+              {
+                enunciado: "¿Quién esculpió el David?",
+                opciones: ["Miguel Ángel", "Leonardo", "Botticelli", "Bernini"],
+                respuesta: "Miguel Ángel",
+                retroalimentacion: "El David es una obra de Miguel Ángel.",
+              },
+              {
+                enunciado: "¿Qué monarquía financió el viaje de Colón?",
+                opciones: ["España", "Portugal", "Francia", "Inglaterra"],
+                respuesta: "España",
+                retroalimentacion: "Los Reyes Católicos apoyaron a Colón.",
+              },
+              {
+                enunciado: "¿Qué océano cruzó Colón en 1492?",
+                opciones: ["Atlántico", "Índico", "Pacífico", "Ártico"],
+                respuesta: "Atlántico",
+                retroalimentacion: "Colón cruzó el Atlántico.",
+              },
+              {
+                enunciado: "¿Qué científico defendió el heliocentrismo?",
+                opciones: ["Copérnico", "Ptolomeo", "Galeno", "Aristóteles"],
+                respuesta: "Copérnico",
+                retroalimentacion: "Copérnico propuso el Sol al centro.",
+              },
+              {
+                enunciado: "¿Qué navegante dio la primera vuelta al mundo?",
+                opciones: ["Magallanes-Elcano", "Marco Polo", "Vespucci", "Da Gama"],
+                respuesta: "Magallanes-Elcano",
+                retroalimentacion: "La expedición completó la circunnavegación.",
+              },
+              {
+                enunciado: "¿Qué obra escribió Maquiavelo?",
+                opciones: ["El Príncipe", "Utopía", "La República", "Hamlet"],
+                respuesta: "El Príncipe",
+                retroalimentacion: "Maquiavelo analizó el poder político.",
+              },
+              {
+                enunciado: "¿Qué explorador llegó a la India rodeando África?",
+                opciones: ["Vasco da Gama", "Colón", "Caboto", "Pizarro"],
+                respuesta: "Vasco da Gama",
+                retroalimentacion: "Da Gama abrió la ruta a Asia.",
+              },
+              {
+                enunciado: "¿Qué civilización conquistó Hernán Cortés?",
+                opciones: ["Azteca", "Inca", "Maya", "Olmeca"],
+                respuesta: "Azteca",
+                retroalimentacion: "Cortés conquistó Tenochtitlán.",
+              },
+              {
+                enunciado: "¿Quién conquistó el Imperio Inca?",
+                opciones: ["Francisco Pizarro", "Colón", "Balboa", "Almagro"],
+                respuesta: "Francisco Pizarro",
+                retroalimentacion: "Pizarro capturó a Atahualpa.",
+              },
+              {
+                enunciado: "¿Qué pintor creó la Capilla Sixtina?",
+                opciones: ["Miguel Ángel", "Rafael", "Botticelli", "Tiziano"],
+                respuesta: "Miguel Ángel",
+                retroalimentacion: "Miguel Ángel pintó la bóveda.",
+              },
+              {
+                enunciado: "¿Qué movimiento religioso inició Lutero?",
+                opciones: ["Reforma", "Contrarreforma", "Humanismo", "Ilustración"],
+                respuesta: "Reforma",
+                retroalimentacion: "Lutero inició la Reforma protestante.",
+              },
+              {
+                enunciado: "¿Qué obra literaria escribió Dante?",
+                opciones: ["Divina Comedia", "Quijote", "Fausto", "Beowulf"],
+                respuesta: "Divina Comedia",
+                retroalimentacion: "Dante escribió la Divina Comedia.",
+              },
+              {
+                enunciado: "¿Qué artista pintó El nacimiento de Venus?",
+                opciones: ["Botticelli", "Caravaggio", "Da Vinci", "Giotto"],
+                respuesta: "Botticelli",
+                retroalimentacion: "Botticelli pintó Venus.",
+              },
+              {
+                enunciado: "¿Qué monarca impulsó la Contrarreforma?",
+                opciones: ["Carlos V", "Luis XIV", "Isabel I", "Pedro I"],
+                respuesta: "Carlos V",
+                retroalimentacion: "Carlos V apoyó la Contrarreforma.",
+              },
+              {
+                enunciado: "¿Qué instrumento mejoró Galileo?",
+                opciones: ["Telescopio", "Microscopio", "Brújula", "Reloj"],
+                respuesta: "Telescopio",
+                retroalimentacion: "Galileo perfeccionó el telescopio.",
+              },
+              {
+                enunciado: "¿Qué país lideró la exploración del Atlántico?",
+                opciones: ["Portugal", "Rusia", "Suecia", "Polonia"],
+                respuesta: "Portugal",
+                retroalimentacion: "Portugal exploró rutas atlánticas.",
+              },
+              {
+                enunciado: "¿Qué obra pintó Rafael en el Vaticano?",
+                opciones: ["La Escuela de Atenas", "Guernica", "Las Meninas", "La Última Cena"],
+                respuesta: "La Escuela de Atenas",
+                retroalimentacion: "Rafael pintó La Escuela de Atenas.",
+              },
+            ],
+          },
+          {
+            nombre: "Revoluciones",
+            descripcion: "Cambios políticos, industriales y sociales.",
+            preguntas: [
+              {
+                enunciado: "¿Qué documento proclamó los derechos del hombre en 1789?",
+                opciones: ["Declaración de los Derechos del Hombre", "Carta Magna", "Constitución de Cádiz", "Bill of Rights"],
+                respuesta: "Declaración de los Derechos del Hombre",
+                retroalimentacion: "La declaración fue clave en la Revolución Francesa.",
+              },
+              {
+                enunciado: "¿Qué país lideró la Revolución Industrial?",
+                opciones: ["Inglaterra", "España", "Portugal", "Rusia"],
+                respuesta: "Inglaterra",
+                retroalimentacion: "Inglaterra fue pionera industrial.",
+              },
+              {
+                enunciado: "¿Qué máquina impulsó la industria textil?",
+                opciones: ["Spinning Jenny", "Telégrafo", "Imprenta", "Locomotora"],
+                respuesta: "Spinning Jenny",
+                retroalimentacion: "La Spinning Jenny aumentó la producción.",
+              },
+              {
+                enunciado: "¿Qué líder encabezó la independencia de Haití?",
+                opciones: ["Toussaint Louverture", "Bolívar", "San Martín", "Sucre"],
+                respuesta: "Toussaint Louverture",
+                retroalimentacion: "Louverture lideró la revolución haitiana.",
+              },
+              {
+                enunciado: "¿Qué evento inició la Revolución Francesa?",
+                opciones: ["Toma de la Bastilla", "Congreso de Viena", "Paz de Westfalia", "Tratado de Versalles"],
+                respuesta: "Toma de la Bastilla",
+                retroalimentacion: "La toma de la Bastilla fue simbólica.",
+              },
+              {
+                enunciado: "¿Quién lideró la independencia de EE.UU.?",
+                opciones: ["George Washington", "Abraham Lincoln", "Thomas Jefferson", "Benjamin Franklin"],
+                respuesta: "George Washington",
+                retroalimentacion: "Washington comandó al ejército continental.",
+              },
+              {
+                enunciado: "¿Qué imperio fue derrotado en la Revolución Americana?",
+                opciones: ["Británico", "Español", "Francés", "Portugués"],
+                respuesta: "Británico",
+                retroalimentacion: "Las colonias vencieron al Imperio Británico.",
+              },
+              {
+                enunciado: "¿Qué líder consolidó el poder tras la Revolución Francesa?",
+                opciones: ["Napoleón", "Robespierre", "Luis XVI", "Marat"],
+                respuesta: "Napoleón",
+                retroalimentacion: "Napoleón se proclamó emperador.",
+              },
+              {
+                enunciado: "¿Qué revolución ocurrió en 1917 en Rusia?",
+                opciones: ["Revolución Bolchevique", "Revolución Gloriosa", "Revolución Industrial", "Revolución Cultural"],
+                respuesta: "Revolución Bolchevique",
+                retroalimentacion: "Los bolcheviques tomaron el poder.",
+              },
+              {
+                enunciado: "¿Qué sistema económico defendía Karl Marx?",
+                opciones: ["Socialismo", "Mercantilismo", "Liberalismo", "Feudalismo"],
+                respuesta: "Socialismo",
+                retroalimentacion: "Marx propuso el socialismo científico.",
+              },
+              {
+                enunciado: "¿Qué fue la Comuna de París?",
+                opciones: ["Gobierno obrero", "Tratado", "Reforma agraria", "Movimiento religioso"],
+                respuesta: "Gobierno obrero",
+                retroalimentacion: "La Comuna fue un gobierno popular.",
+              },
+              {
+                enunciado: "¿Qué revolución inició en 1910 en México?",
+                opciones: ["Revolución Mexicana", "Revolución Cubana", "Revolución Gloriosa", "Revolución Verde"],
+                respuesta: "Revolución Mexicana",
+                retroalimentacion: "La Revolución Mexicana cambió el país.",
+              },
+              {
+                enunciado: "¿Qué líder mexicano impulsó la reforma agraria?",
+                opciones: ["Emiliano Zapata", "Porfirio Díaz", "Villa", "Madero"],
+                respuesta: "Emiliano Zapata",
+                retroalimentacion: "Zapata defendió 'Tierra y libertad'.",
+              },
+              {
+                enunciado: "¿Qué evento marcó el inicio de la independencia de Venezuela?",
+                opciones: ["19 de abril de 1810", "5 de julio de 1811", "Batalla de Carabobo", "Congreso de Angostura"],
+                respuesta: "19 de abril de 1810",
+                retroalimentacion: "Fue el inicio del proceso independentista.",
+              },
+              {
+                enunciado: "¿Qué batalla selló la independencia de Venezuela?",
+                opciones: ["Carabobo", "Boyacá", "Pichincha", "Junín"],
+                respuesta: "Carabobo",
+                retroalimentacion: "Carabobo fue decisiva en 1821.",
+              },
+              {
+                enunciado: "¿Qué documento firmó la independencia de Venezuela?",
+                opciones: ["Acta de 1811", "Constitución de 1830", "Grito de Dolores", "Tratado de Tordesillas"],
+                respuesta: "Acta de 1811",
+                retroalimentacion: "El 5 de julio se firmó el Acta.",
+              },
+              {
+                enunciado: "¿Qué revolución terminó en 1959 en Cuba?",
+                opciones: ["Revolución Cubana", "Revolución Gloriosa", "Revolución Industrial", "Revolución Cultural"],
+                respuesta: "Revolución Cubana",
+                retroalimentacion: "Fidel Castro lideró la Revolución Cubana.",
+              },
+              {
+                enunciado: "¿Qué líder cubano encabezó la revolución?",
+                opciones: ["Fidel Castro", "Che Guevara", "Batista", "Allende"],
+                respuesta: "Fidel Castro",
+                retroalimentacion: "Fidel Castro lideró el movimiento.",
+              },
+              {
+                enunciado: "¿Qué movimiento buscó abolir la esclavitud en el siglo XIX?",
+                opciones: ["Abolicionismo", "Mercantilismo", "Colonialismo", "Nacionalismo"],
+                respuesta: "Abolicionismo",
+                retroalimentacion: "El abolicionismo luchó contra la esclavitud.",
+              },
+              {
+                enunciado: "¿Qué tratado terminó la Primera Guerra Mundial?",
+                opciones: ["Tratado de Versalles", "Tratado de Utrecht", "Tratado de París", "Tratado de Viena"],
+                respuesta: "Tratado de Versalles",
+                retroalimentacion: "Versalles se firmó en 1919.",
+              },
+            ],
+          },
+          {
+            nombre: "Siglo XX",
+            descripcion: "Guerras mundiales, tecnología y geopolítica.",
+            preguntas: [
+              {
+                enunciado: "¿Qué conflicto inició en 1914?",
+                opciones: ["Primera Guerra Mundial", "Guerra Fría", "Guerra de Crimea", "Guerra de los Cien Años"],
+                respuesta: "Primera Guerra Mundial",
+                retroalimentacion: "La Primera Guerra Mundial inició en 1914.",
+              },
+              {
+                enunciado: "¿Qué evento desencadenó la Primera Guerra Mundial?",
+                opciones: ["Asesinato de Sarajevo", "Revolución Rusa", "Tratado de Versalles", "Ataque a Pearl Harbor"],
+                respuesta: "Asesinato de Sarajevo",
+                retroalimentacion: "El asesinato del archiduque fue la chispa.",
+              },
+              {
+                enunciado: "¿Qué organización surgió tras la Segunda Guerra Mundial?",
+                opciones: ["ONU", "OTAN", "Unión Europea", "Liga Hanseática"],
+                respuesta: "ONU",
+                retroalimentacion: "La ONU se fundó en 1945.",
+              },
+              {
+                enunciado: "¿Qué país lanzó la bomba atómica en 1945?",
+                opciones: ["Estados Unidos", "Alemania", "Japón", "URSS"],
+                respuesta: "Estados Unidos",
+                retroalimentacion: "EE.UU. lanzó bombas en Hiroshima y Nagasaki.",
+              },
+              {
+                enunciado: "¿Qué alianza se formó en 1949?",
+                opciones: ["OTAN", "Pacto de Varsovia", "ASEAN", "OEA"],
+                respuesta: "OTAN",
+                retroalimentacion: "La OTAN nació en 1949.",
+              },
+              {
+                enunciado: "¿Qué muro cayó en 1989?",
+                opciones: ["Muro de Berlín", "Muralla China", "Muro de Adriano", "Muro de Varsovia"],
+                respuesta: "Muro de Berlín",
+                retroalimentacion: "La caída del muro simbolizó el fin de la Guerra Fría.",
+              },
+              {
+                enunciado: "¿Qué conflicto enfrentó a EE.UU. y la URSS?",
+                opciones: ["Guerra Fría", "Guerra de Corea", "Guerra de Vietnam", "Guerra del Golfo"],
+                respuesta: "Guerra Fría",
+                retroalimentacion: "Fue un conflicto ideológico y geopolítico.",
+              },
+              {
+                enunciado: "¿Qué carrera tecnológica marcó la Guerra Fría?",
+                opciones: ["Carrera espacial", "Carrera naval", "Carrera armamentista", "Carrera comercial"],
+                respuesta: "Carrera espacial",
+                retroalimentacion: "La carrera espacial impulsó la tecnología.",
+              },
+              {
+                enunciado: "¿Quién fue el primer humano en la Luna?",
+                opciones: ["Neil Armstrong", "Yuri Gagarin", "Buzz Aldrin", "John Glenn"],
+                respuesta: "Neil Armstrong",
+                retroalimentacion: "Armstrong llegó a la Luna en 1969.",
+              },
+              {
+                enunciado: "¿Qué país fue potencia del bloque oriental?",
+                opciones: ["URSS", "Reino Unido", "Francia", "Italia"],
+                respuesta: "URSS",
+                retroalimentacion: "La URSS lideró el bloque oriental.",
+              },
+              {
+                enunciado: "¿Qué conflicto se libró en Vietnam?",
+                opciones: ["Guerra de Vietnam", "Guerra de Corea", "Guerra del Golfo", "Guerra Civil Española"],
+                respuesta: "Guerra de Vietnam",
+                retroalimentacion: "Vietnam fue un conflicto de la Guerra Fría.",
+              },
+              {
+                enunciado: "¿Qué país fue dividido en dos después de 1945?",
+                opciones: ["Alemania", "España", "Brasil", "Canadá"],
+                respuesta: "Alemania",
+                retroalimentacion: "Alemania se dividió en RFA y RDA.",
+              },
+              {
+                enunciado: "¿Qué evento inició la Segunda Guerra Mundial?",
+                opciones: ["Invasión de Polonia", "Ataque a Pearl Harbor", "Revolución China", "Guerra Civil Española"],
+                respuesta: "Invasión de Polonia",
+                retroalimentacion: "Alemania invadió Polonia en 1939.",
+              },
+              {
+                enunciado: "¿Qué líder encabezó la India independiente?",
+                opciones: ["Mahatma Gandhi", "Churchill", "Mandela", "Nehru"],
+                respuesta: "Mahatma Gandhi",
+                retroalimentacion: "Gandhi lideró la independencia con no violencia.",
+              },
+              {
+                enunciado: "¿Qué líder sudafricano luchó contra el apartheid?",
+                opciones: ["Nelson Mandela", "Desmond Tutu", "De Klerk", "Mbeki"],
+                respuesta: "Nelson Mandela",
+                retroalimentacion: "Mandela fue símbolo de la lucha antiapartheid.",
+              },
+              {
+                enunciado: "¿Qué organización busca la cooperación económica en Europa?",
+                opciones: ["Unión Europea", "OTAN", "ONU", "OEA"],
+                respuesta: "Unión Europea",
+                retroalimentacion: "La UE integra economías europeas.",
+              },
+              {
+                enunciado: "¿Qué revolución tecnológica marcó finales del siglo XX?",
+                opciones: ["Internet", "Imprenta", "Máquina de vapor", "Telégrafo"],
+                respuesta: "Internet",
+                retroalimentacion: "Internet cambió la comunicación global.",
+              },
+              {
+                enunciado: "¿Qué conflicto ocurrió en 1991 en el Golfo?",
+                opciones: ["Guerra del Golfo", "Guerra de Corea", "Guerra Civil Española", "Guerra de los Balcanes"],
+                respuesta: "Guerra del Golfo",
+                retroalimentacion: "La Guerra del Golfo inició en 1991.",
+              },
+              {
+                enunciado: "¿Qué país lanzó el primer satélite artificial?",
+                opciones: ["URSS", "Estados Unidos", "China", "Francia"],
+                respuesta: "URSS",
+                retroalimentacion: "La URSS lanzó el Sputnik en 1957.",
+              },
+              {
+                enunciado: "¿Qué líder fue primer ministro del Reino Unido en la Segunda Guerra Mundial?",
+                opciones: ["Winston Churchill", "Thatcher", "Chamberlain", "Attlee"],
+                respuesta: "Winston Churchill",
+                retroalimentacion: "Churchill lideró al Reino Unido durante la guerra.",
+              },
+            ],
           },
         ],
-        indicePeriodoActual: 0,
+        indiceCategoriaActual: 0,
         indicePreguntaActual: 0,
         vidas: 3,
         puntaje: 0,
       };
 
-      // Referencias a elementos del DOM para actualizar la interfaz.
-      let contenedorPeriodos;
-      let etiquetaPeriodo;
+      let contenedorCategorias;
+      let etiquetaCategoria;
       let etiquetaNivel;
       let etiquetaVidas;
       let etiquetaPuntaje;
@@ -664,41 +859,43 @@
       let textoFeedback;
       let estadoGuardado;
 
-      // Renderiza las tarjetas de periodos disponibles.
-      function renderizarPeriodos() {
-        contenedorPeriodos.innerHTML = "";
-        estado.periodos.forEach((periodo, indice) => {
+      function renderizarCategorias() {
+        contenedorCategorias.innerHTML = "";
+        estado.categorias.forEach((categoria, indice) => {
           const tarjeta = document.createElement("button");
-          tarjeta.className = "period";
-          tarjeta.innerHTML = `<strong>${periodo.nombre}</strong><span>${periodo.descripcion}</span>`;
+          tarjeta.className =
+            "rounded-2xl bg-slate-50 p-4 text-left shadow-inner transition hover:-translate-y-1 hover:shadow-md";
+          tarjeta.innerHTML = `
+            <p class="text-sm font-semibold text-slate-800">${categoria.nombre}</p>
+            <p class="text-xs text-slate-400">${categoria.descripcion}</p>
+            <p class="mt-2 text-xs text-indigo-500 font-semibold">${categoria.preguntas.length} preguntas</p>
+          `;
           tarjeta.addEventListener("click", () => {
-            estado.indicePeriodoActual = indice;
+            estado.indiceCategoriaActual = indice;
             estado.indicePreguntaActual = 0;
             estado.vidas = 3;
             estado.puntaje = 0;
             actualizarJuego();
           });
-          contenedorPeriodos.appendChild(tarjeta);
+          contenedorCategorias.appendChild(tarjeta);
         });
       }
 
-      // Actualiza los indicadores de vidas, puntaje y nivel.
       function actualizarEstado() {
         etiquetaVidas.textContent = estado.vidas;
         etiquetaPuntaje.textContent = estado.puntaje;
-        const periodo = estado.periodos[estado.indicePeriodoActual];
-        etiquetaPeriodo.textContent = periodo.nombre;
-        etiquetaNivel.textContent = periodo.nivel.nombre;
+        const categoria = estado.categorias[estado.indiceCategoriaActual];
+        etiquetaCategoria.textContent = categoria.nombre;
+        etiquetaNivel.textContent = "Reto activo";
       }
 
-      // Muestra la pregunta actual y sus opciones.
       function actualizarPregunta() {
-        const periodo = estado.periodos[estado.indicePeriodoActual];
-        const pregunta = periodo.nivel.preguntas[estado.indicePreguntaActual];
+        const categoria = estado.categorias[estado.indiceCategoriaActual];
+        const pregunta = categoria.preguntas[estado.indicePreguntaActual];
         if (!pregunta) {
-          textoPregunta.textContent = "¡Nivel completado!";
+          textoPregunta.textContent = "¡Categoría completada!";
           contenedorOpciones.innerHTML = "";
-          textoFeedback.textContent = "Felicidades, desbloqueaste el siguiente reto.";
+          textoFeedback.textContent = "Excelente trabajo. Puedes elegir otra categoría.";
           guardarPartida();
           return;
         }
@@ -706,7 +903,8 @@
         contenedorOpciones.innerHTML = "";
         pregunta.opciones.forEach((opcion) => {
           const boton = document.createElement("button");
-          boton.className = "option";
+          boton.className =
+            "rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:text-indigo-600";
           boton.textContent = opcion;
           boton.addEventListener("click", () => manejarRespuesta(opcion, pregunta, boton));
           contenedorOpciones.appendChild(boton);
@@ -714,16 +912,15 @@
         textoFeedback.textContent = "Selecciona la opción correcta.";
       }
 
-      // Evalúa la respuesta del jugador y actualiza vidas/puntaje.
       function manejarRespuesta(opcionSeleccionada, pregunta, boton) {
         const esCorrecta = opcionSeleccionada === pregunta.respuesta;
         if (esCorrecta) {
           estado.puntaje += 10;
-          boton.classList.add("option--correct");
+          boton.classList.add("anim-correcto", "bg-emerald-100", "text-emerald-700");
           textoFeedback.textContent = `✅ ${pregunta.retroalimentacion}`;
         } else {
           estado.vidas -= 1;
-          boton.classList.add("option--wrong");
+          boton.classList.add("anim-error", "bg-rose-100", "text-rose-700");
           textoFeedback.textContent = `❌ ${pregunta.retroalimentacion} Te quedan ${estado.vidas} vidas.`;
         }
         actualizarEstado();
@@ -740,16 +937,14 @@
         }, 700);
       }
 
-      // Agrupa actualizaciones de estado y preguntas.
       function actualizarJuego() {
         actualizarEstado();
         actualizarPregunta();
       }
 
-      // Guarda el progreso en el navegador.
       function guardarPartida() {
         const datos = {
-          indicePeriodoActual: estado.indicePeriodoActual,
+          indiceCategoriaActual: estado.indiceCategoriaActual,
           indicePreguntaActual: estado.indicePreguntaActual,
           vidas: estado.vidas,
           puntaje: estado.puntaje,
@@ -758,7 +953,6 @@
         estadoGuardado.textContent = "Partida guardada correctamente.";
       }
 
-      // Carga la partida si existe en el navegador.
       function cargarPartida() {
         const guardado = localStorage.getItem(CLAVE_GUARDADO);
         if (!guardado) {
@@ -766,7 +960,7 @@
           return false;
         }
         const datos = JSON.parse(guardado);
-        estado.indicePeriodoActual = datos.indicePeriodoActual ?? 0;
+        estado.indiceCategoriaActual = datos.indiceCategoriaActual ?? 0;
         estado.indicePreguntaActual = datos.indicePreguntaActual ?? 0;
         estado.vidas = datos.vidas ?? 3;
         estado.puntaje = datos.puntaje ?? 0;
@@ -774,7 +968,6 @@
         return true;
       }
 
-      // Asigna acciones a los botones del menú principal.
       function enlazarMenu() {
         document.querySelectorAll("[data-action]").forEach((boton) => {
           boton.addEventListener("click", () => {
@@ -798,10 +991,9 @@
         });
       }
 
-      // Inicio: renderiza periodos, enlaza el menú y pinta la primera vista.
       document.addEventListener("DOMContentLoaded", () => {
-        contenedorPeriodos = document.getElementById("periods");
-        etiquetaPeriodo = document.getElementById("periodLabel");
+        contenedorCategorias = document.getElementById("periods");
+        etiquetaCategoria = document.getElementById("periodLabel");
         etiquetaNivel = document.getElementById("levelLabel");
         etiquetaVidas = document.getElementById("lives");
         etiquetaPuntaje = document.getElementById("score");
@@ -810,7 +1002,7 @@
         textoFeedback = document.getElementById("feedbackText");
         estadoGuardado = document.getElementById("saveStatus");
 
-        renderizarPeriodos();
+        renderizarCategorias();
         enlazarMenu();
         actualizarJuego();
       });
