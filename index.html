@@ -346,7 +346,7 @@
       .dificultad-burbuja {
         position: absolute;
         top: -0.1rem;
-        transform: translateX(-50%);
+        transform: translate(-50%, -6px);
         background: var(--accent);
         color: #fff;
         padding: 0.35rem 0.7rem;
@@ -364,9 +364,9 @@
         content: "";
         position: absolute;
         left: 50%;
-        bottom: -8px;
+        bottom: -6px;
         transform: translateX(-50%);
-        border-width: 8px 8px 0 8px;
+        border-width: 6px 6px 0 6px;
         border-style: solid;
         border-color: var(--accent) transparent transparent transparent;
       }
@@ -2168,11 +2168,13 @@
         const guardados = obtenerGuardados();
         const existente = guardados.find((item) => item.nombre === nombre);
         const maximoPuntaje = Math.max(existente?.maximoPuntaje ?? 0, estado.puntaje);
+        const nivelDificultad = obtenerEtiquetaDificultad(datos.dificultad ?? estado.dificultad);
         const registro = {
           id: existente?.id ?? crypto.randomUUID(),
           nombre,
           fecha: new Date().toLocaleString(),
           maximoPuntaje,
+          dificultad: nivelDificultad,
           datos,
         };
         if (existente) {
@@ -2269,7 +2271,7 @@
             <div class="flex items-center justify-between gap-2">
               <div>
                 <span>${registro.nombre}</span>
-                <span class="block text-[10px] text-slate-400">${registro.fecha}</span>
+                <span class="block text-[10px] text-slate-400">${registro.fecha} · ${registro.dificultad ?? "Normal"}</span>
               </div>
               <span class="rounded-full bg-indigo-100 px-2 py-1 text-[10px] font-semibold text-indigo-600">
                 Máx ${registro.maximoPuntaje}
