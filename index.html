@@ -1899,11 +1899,14 @@
       let botonInvestigar;
       let botonEliminar;
       let temporizador;
+      let temporizadorInvestigar;
+      let tiempoInvestigacionRestante = 0;
       let selectorDificultad;
       let textoDificultad;
       let burbujaDificultad;
       let rellenoDificultad;
 
+      // Renderiza las tarjetas de categorías según el estado actual.
       function renderizarCategorias() {
         contenedorCategorias.innerHTML = "";
         estado.categorias.forEach((categoria, indice) => {
@@ -1928,8 +1931,9 @@
         });
       }
 
+      // Refresca estadísticas, categoría y nivel en pantalla.
       function actualizarEstado() {
-        etiquetaVidas.textContent = estado.vidas;
+        etiquetaVidas.textContent = obtenerTextoVidas();
         etiquetaPuntaje.textContent = estado.puntaje;
         etiquetaTiempo.textContent = estado.tiempoRestante;
         const categoria = estado.categorias[estado.indiceCategoriaActual];
@@ -1937,6 +1941,12 @@
         etiquetaNivel.textContent = "Reto activo";
       }
 
+      // Usa el infinito en modo principiante (vidas ilimitadas).
+      function obtenerTextoVidas() {
+        return estado.configuracion.vidasIniciales === 0 ? "∞" : estado.vidas;
+      }
+
+      // Configuración base por dificultad (vidas, tiempos, probabilidad especial, comodines).
       function obtenerConfiguracion(dificultad) {
         switch (dificultad) {
           case "principiante":
@@ -1997,6 +2007,7 @@
         }
       }
 
+      // Combina preguntas normales y avanzadas en difícil/hardcore.
       function obtenerPreguntasActivas(categoria) {
         if (["dificil", "hardcore"].includes(estado.dificultad) && categoria.preguntasDificiles) {
           return categoria.preguntas.concat(categoria.preguntasDificiles);
@@ -2019,6 +2030,7 @@
         return etiquetas[nivel] ?? "Normal";
       }
 
+      // Sincroniza slider, burbuja y tema visual con la dificultad actual.
       function actualizarSliderDificultad(nivel) {
         const indice = NIVELES_DIFICULTAD.includes(nivel) ? NIVELES_DIFICULTAD.indexOf(nivel) : 2;
         const porcentaje = indice <= 0 ? 0 : (indice / (NIVELES_DIFICULTAD.length - 1)) * 100;
@@ -2033,6 +2045,7 @@
         document.body.dataset.theme = nivel;
       }
 
+      // Aplica la dificultad y reinicia parámetros clave si corresponde.
       function aplicarDificultad(nivel, { reiniciar = true } = {}) {
         estado.dificultad = nivel;
         estado.configuracion = obtenerConfiguracion(nivel);
@@ -2053,6 +2066,7 @@
           }
           estado.indicePreguntaActual = Math.min(estado.indicePreguntaActual, totalPreguntas - 1);
         }
+        detenerTemporizadorInvestigacion();
         actualizarSliderDificultad(nivel);
         renderizarCategorias();
         actualizarComodines();
@@ -2060,6 +2074,7 @@
         textoDificultad.textContent = `Modo ${obtenerEtiquetaDificultad(nivel)} activado.`;
       }
 
+      // Genera la siguiente pregunta y pinta las opciones.
       function actualizarPregunta() {
         const categoria = estado.categorias[estado.indiceCategoriaActual];
         const preguntasActivas = obtenerPreguntasActivas(categoria);
@@ -2089,6 +2104,7 @@
         iniciarTemporizador();
       }
 
+      // Evalúa la respuesta y aplica consecuencias.
       function manejarRespuesta(opcionSeleccionada, pregunta, boton) {
         const esCorrecta = opcionSeleccionada === pregunta.respuesta;
         if (esCorrecta) {
@@ -2105,7 +2121,8 @@
             estado.vidas -= 1;
           }
           boton.classList.add("anim-error", "bg-rose-100", "text-rose-700");
-          textoFeedback.textContent = `❌ ${pregunta.retroalimentacion} Te quedan ${estado.vidas} vidas.`;
+          const vidasTexto = obtenerTextoVidas();
+          textoFeedback.textContent = `❌ ${pregunta.retroalimentacion} Te quedan ${vidasTexto} vidas.`;
           if (estado.dificultad === "hardcore") {
             perderPartida("Modo hardcore: fallaste la pregunta.");
             return;
@@ -2123,6 +2140,7 @@
         }, 700);
       }
 
+      // Actualiza todo el estado visible del juego.
       function actualizarJuego() {
         actualizarEstado();
         actualizarPregunta();
@@ -2138,6 +2156,7 @@
         localStorage.setItem(CLAVE_LISTA_GUARDADOS, JSON.stringify(guardados));
       }
 
+      // Guarda el estado en localStorage (si la dificultad lo permite).
       function guardarPartida() {
         if (!estado.configuracion.puedeGuardar) {
           estadoGuardado.textContent = "En modo hardcore no se guardan partidas.";
@@ -2345,6 +2364,7 @@
         return especiales[Math.floor(Math.random() * especiales.length)];
       }
 
+      // Temporizador de la pregunta actual.
       function iniciarTemporizador() {
         detenerTemporizador();
         etiquetaTiempo.textContent = estado.tiempoRestante;
@@ -2365,6 +2385,31 @@
         }
       }
 
+      // Temporizador visual del comodín de investigar.
+      function iniciarTemporizadorInvestigacion() {
+        tiempoInvestigacionRestante = 10;
+        if (temporizadorInvestigar) {
+          clearInterval(temporizadorInvestigar);
+        }
+        actualizarComodines();
+        temporizadorInvestigar = setInterval(() => {
+          tiempoInvestigacionRestante -= 1;
+          actualizarComodines();
+          if (tiempoInvestigacionRestante <= 0) {
+            detenerTemporizadorInvestigacion();
+          }
+        }, 1000);
+      }
+
+      function detenerTemporizadorInvestigacion() {
+        if (temporizadorInvestigar) {
+          clearInterval(temporizadorInvestigar);
+          temporizadorInvestigar = null;
+        }
+        tiempoInvestigacionRestante = 0;
+        actualizarComodines();
+      }
+
       function perderPartida(mensaje) {
         textoPregunta.textContent = "Partida perdida.";
         contenedorOpciones.innerHTML = "";
@@ -2377,6 +2422,7 @@
         );
         estado.comodines = { ...estado.configuracion.comodines };
         detenerTemporizador();
+        detenerTemporizadorInvestigacion();
         actualizarEstado();
         actualizarComodines();
         guardarPartida();
@@ -2400,6 +2446,7 @@
         actualizarPregunta();
       }
 
+      // Ajusta texto/estado de botones de comodines.
       function actualizarComodines() {
         botonPista.disabled = estado.comodines.pista <= 0;
         botonSaltar.disabled = estado.comodines.saltar <= 0;
@@ -2407,7 +2454,8 @@
         botonEliminar.disabled = estado.comodines.eliminar <= 0;
         botonPista.textContent = `Comodín: Pista (${estado.comodines.pista})`;
         botonSaltar.textContent = `Comodín: Saltar (${estado.comodines.saltar})`;
-        botonInvestigar.textContent = `Comodín: Investigar 10s (${estado.comodines.investigar})`;
+        const etiquetaInvestigar = tiempoInvestigacionRestante > 0 ? `${tiempoInvestigacionRestante}s` : "10s";
+        botonInvestigar.textContent = `Comodín: Investigar ${etiquetaInvestigar} (${estado.comodines.investigar})`;
         botonEliminar.textContent = `Comodín: Eliminar 2 (${estado.comodines.eliminar})`;
       }
 
@@ -2435,12 +2483,14 @@
         guardarPartida();
       }
 
+      // Permite salir temporalmente de la pestaña sin penalización.
       function usarComodinInvestigar() {
         if (!estado.comodines.investigar) {
           return;
         }
         estado.comodines.investigar -= 1;
         estado.permitirSalidaHasta = Date.now() + 10000;
+        iniciarTemporizadorInvestigacion();
         actualizarComodines();
         estadoGuardado.textContent = "Puedes salir 10 segundos para investigar.";
         guardarPartida();

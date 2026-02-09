@@ -119,6 +119,12 @@ El proyecto generará un impacto positivo al:
 - Retos basados en acontecimientos históricos.
 - Sistema de puntos, logros y recompensas.
 - Retroalimentación inmediata para reforzar el aprendizaje.
+- **Modalidades y dificultades:** cinco modos (Principiante, Fácil, Normal, Difícil, Hardcore) con reglas diferenciadas de vidas, tiempos, probabilidades de preguntas especiales y guardado.
+- **Preguntas especiales:** pueden aparecer con tiempos distintos y recompensas (vidas extra), controladas por probabilidad según dificultad.
+- **Tiempos por pregunta:** el temporizador cambia por dificultad y se actualiza al cargar nuevas preguntas.
+- **Comodines y funciones:** pista, saltar, investigar 10s y eliminar 2 respuestas; su disponibilidad y cantidad varían por dificultad.
+- **Antitrampa:** salir de la pestaña sin el comodín correspondiente penaliza la pregunta; en hardcore el fallo reinicia la ronda.
+- **Guardado de progreso:** permitido en la mayoría de modos; en hardcore se desactiva para mantener el reto.
 
 ## Restricciones del Sistema
 - Limitaciones de hardware en instituciones educativas.
@@ -172,3 +178,9 @@ python app_gui.py
 ```
 
 Las partidas se guardan en `partidas_guardadas.json`.
+
+## Solución de problemas
+Si la interfaz de escritorio no abre en tu PC:
+- Verifica que estás usando **Python 3.10+**.
+- Confirma que **Tkinter** está instalado (en Linux puede requerir `python3-tk`).
+- En Windows/Mac, reinstala Python marcando la opción de Tk/Tcl si no aparece la ventana.

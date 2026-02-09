@@ -702,6 +702,8 @@ class AplicacionJuego:
         self.pregunta_especial = False
         self.pregunta_actual: Pregunta | None = None
         self.temporizador_id: str | None = None
+        self.temporizador_investigar_id: str | None = None
+        self.tiempo_investigar_restante = 0
         self.comodines = {"pista": 1, "saltar": 1, "investigar": 1, "eliminar": 1}
         self.permitir_salida_hasta: float = 0.0
         self.dificultad = "normal"
@@ -803,6 +805,7 @@ class AplicacionJuego:
         self.tiempo_limite = self.configuracion["tiempo_pregunta"]
         self.tiempo_restante = self.configuracion["tiempo_pregunta"]
         self.comodines = self.configuracion["comodines"].copy()
+        self._detener_temporizador_investigar()
         if actualizar_selector and hasattr(self, "selector_dificultad"):
             opciones = ["principiante", "facil", "normal", "dificil", "hardcore"]
             if nivel in opciones:
@@ -911,30 +914,34 @@ class AplicacionJuego:
 
         self.panel_comodines = ttk.Frame(self.columna_juego, style="Tarjeta.TFrame")
         self.panel_comodines.pack(fill="x", padx=20, pady=(8, 0))
-        ttk.Button(
+        self.boton_pista = ttk.Button(
             self.panel_comodines,
             text="Comodín: Pista",
             style="BotonSecundario.TButton",
             command=self.usar_comodin_pista,
-        ).pack(side="left", padx=4, pady=6)
-        ttk.Button(
+        )
+        self.boton_pista.pack(side="left", padx=4, pady=6)
+        self.boton_saltar = ttk.Button(
             self.panel_comodines,
             text="Comodín: Saltar",
             style="BotonSecundario.TButton",
             command=self.usar_comodin_saltar,
-        ).pack(side="left", padx=4, pady=6)
-        ttk.Button(
+        )
+        self.boton_saltar.pack(side="left", padx=4, pady=6)
+        self.boton_investigar = ttk.Button(
             self.panel_comodines,
             text="Comodín: Investigar 10s",
             style="BotonSecundario.TButton",
             command=self.usar_comodin_investigar,
-        ).pack(side="left", padx=4, pady=6)
-        ttk.Button(
+        )
+        self.boton_investigar.pack(side="left", padx=4, pady=6)
+        self.boton_eliminar = ttk.Button(
             self.panel_comodines,
             text="Comodín: Eliminar 2",
             style="BotonSecundario.TButton",
             command=self.usar_comodin_eliminar,
-        ).pack(side="left", padx=4, pady=6)
+        )
+        self.boton_eliminar.pack(side="left", padx=4, pady=6)
 
         self.lienzo_confeti = tk.Canvas(self.columna_juego, height=120, bg="#ffffff", highlightthickness=0)
         self.lienzo_confeti.pack(fill="x", padx=20, pady=(12, 16))
@@ -1080,6 +1087,7 @@ class AplicacionJuego:
         self.vidas = self.configuracion["vidas_iniciales"]
         self.comodines = self.configuracion["comodines"].copy()
         self.retroalimentacion.config(text=f"{mensaje} Debes empezar de cero.")
+        self._detener_temporizador_investigar()
         self._actualizar_comodines()
         self._detener_temporizador()
         self._guardar_automatico()
@@ -1099,10 +1107,22 @@ class AplicacionJuego:
         self._actualizar_panel()
 
     def _actualizar_comodines(self) -> None:
-        orden = ["pista", "saltar", "investigar", "eliminar"]
-        for boton, clave in zip(self.panel_comodines.winfo_children(), orden):
+        botones = {
+            "pista": self.boton_pista,
+            "saltar": self.boton_saltar,
+            "investigar": self.boton_investigar,
+            "eliminar": self.boton_eliminar,
+        }
+        for clave, boton in botones.items():
             cantidad = self.comodines.get(clave, 0)
             boton.configure(state="normal" if cantidad > 0 else "disabled")
+        etiqueta_investigar = f"{self.tiempo_investigar_restante}s" if self.tiempo_investigar_restante > 0 else "10s"
+        self.boton_pista.configure(text=f"Comodín: Pista ({self.comodines.get('pista', 0)})")
+        self.boton_saltar.configure(text=f"Comodín: Saltar ({self.comodines.get('saltar', 0)})")
+        self.boton_investigar.configure(
+            text=f"Comodín: Investigar {etiqueta_investigar} ({self.comodines.get('investigar', 0)})"
+        )
+        self.boton_eliminar.configure(text=f"Comodín: Eliminar 2 ({self.comodines.get('eliminar', 0)})")
 
     def usar_comodin_pista(self) -> None:
         if self.comodines["pista"] <= 0 or not self.pregunta_actual:
@@ -1127,9 +1147,34 @@ class AplicacionJuego:
             return
         self.comodines["investigar"] -= 1
         self.permitir_salida_hasta = datetime.now().timestamp() + 10
+        self._iniciar_temporizador_investigar()
         self.estado_guardado.config(text="Puedes salir 10 segundos para investigar.")
         self._actualizar_comodines()
         self._guardar_automatico()
+
+    # Temporizador visual del comodín de investigar.
+    def _iniciar_temporizador_investigar(self) -> None:
+        self.tiempo_investigar_restante = 10
+        if self.temporizador_investigar_id:
+            self.raiz.after_cancel(self.temporizador_investigar_id)
+        self._actualizar_comodines()
+        self.temporizador_investigar_id = self.raiz.after(1000, self._actualizar_temporizador_investigar)
+
+    def _actualizar_temporizador_investigar(self) -> None:
+        self.tiempo_investigar_restante -= 1
+        self._actualizar_comodines()
+        if self.tiempo_investigar_restante <= 0:
+            self._detener_temporizador_investigar()
+            return
+        self.temporizador_investigar_id = self.raiz.after(1000, self._actualizar_temporizador_investigar)
+
+    def _detener_temporizador_investigar(self) -> None:
+        if self.temporizador_investigar_id:
+            self.raiz.after_cancel(self.temporizador_investigar_id)
+            self.temporizador_investigar_id = None
+        self.tiempo_investigar_restante = 0
+        if hasattr(self, "boton_investigar"):
+            self._actualizar_comodines()
 
     def usar_comodin_eliminar(self) -> None:
         if self.comodines["eliminar"] <= 0 or not self.pregunta_actual:
