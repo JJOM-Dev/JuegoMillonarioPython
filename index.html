@@ -890,6 +890,7 @@
         indicePreguntaActual: 0,
         vidas: 3,
         puntaje: 0,
+        ordenPreguntas: [],
       };
 
       let contenedorCategorias;
@@ -920,6 +921,7 @@
             estado.indicePreguntaActual = 0;
             estado.vidas = 3;
             estado.puntaje = 0;
+            estado.ordenPreguntas = obtenerOrdenAleatorio(categoria.preguntas.length);
             actualizarJuego();
             guardarPartida();
           });
@@ -937,7 +939,11 @@
 
       function actualizarPregunta() {
         const categoria = estado.categorias[estado.indiceCategoriaActual];
-        const pregunta = categoria.preguntas[estado.indicePreguntaActual];
+        if (!estado.ordenPreguntas.length) {
+          estado.ordenPreguntas = obtenerOrdenAleatorio(categoria.preguntas.length);
+        }
+        const indiceReal = estado.ordenPreguntas[estado.indicePreguntaActual];
+        const pregunta = categoria.preguntas[indiceReal];
         if (!pregunta) {
           textoPregunta.textContent = "¡Categoría completada!";
           contenedorOpciones.innerHTML = "";
@@ -1013,6 +1019,7 @@
           indicePreguntaActual: estado.indicePreguntaActual,
           vidas: estado.vidas,
           puntaje: estado.puntaje,
+          ordenPreguntas: estado.ordenPreguntas,
         };
         localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(datos));
 
@@ -1048,6 +1055,8 @@
         estado.indicePreguntaActual = datos.indicePreguntaActual ?? 0;
         estado.vidas = datos.vidas ?? 3;
         estado.puntaje = datos.puntaje ?? 0;
+        estado.ordenPreguntas =
+          datos.ordenPreguntas ?? obtenerOrdenAleatorio(estado.categorias[estado.indiceCategoriaActual].preguntas.length);
         estadoGuardado.textContent = "Partida cargada.";
         return true;
       }
@@ -1063,9 +1072,21 @@
         estado.indicePreguntaActual = registro.datos.indicePreguntaActual ?? 0;
         estado.vidas = registro.datos.vidas ?? 3;
         estado.puntaje = registro.datos.puntaje ?? 0;
+        estado.ordenPreguntas =
+          registro.datos.ordenPreguntas ??
+          obtenerOrdenAleatorio(estado.categorias[estado.indiceCategoriaActual].preguntas.length);
         localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(registro.datos));
         estadoGuardado.textContent = `Partida cargada: ${registro.nombre}`;
         actualizarJuego();
+      }
+
+      function obtenerOrdenAleatorio(total) {
+        const indices = Array.from({ length: total }, (_, indice) => indice);
+        for (let i = indices.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
+        return indices;
       }
 
       function renderizarGuardados() {
@@ -1121,6 +1142,9 @@
               estado.indicePreguntaActual = 0;
               estado.vidas = 3;
               estado.puntaje = 0;
+              estado.ordenPreguntas = obtenerOrdenAleatorio(
+                estado.categorias[estado.indiceCategoriaActual].preguntas.length
+              );
               actualizarJuego();
               guardarPartida();
               estadoGuardado.textContent = "Nueva partida iniciada.";
@@ -1155,6 +1179,7 @@
 
         renderizarCategorias();
         enlazarMenu();
+        estado.ordenPreguntas = obtenerOrdenAleatorio(estado.categorias[0].preguntas.length);
         actualizarJuego();
         renderizarGuardados();
 

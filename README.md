@@ -133,3 +133,12 @@ python -m http.server 8000
 ```
 
 Luego visita `http://localhost:8000` en el navegador.
+
+## Interfaz de lujo en Python
+Se incluye una versión de escritorio con Tkinter y gestor de partidas guardadas.
+
+```bash
+python app_gui.py
+```
+
+Las partidas se guardan en `partidas_guardadas.json`.
