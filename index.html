@@ -117,44 +117,44 @@
           <div class="mt-4 flex flex-col gap-3">
             <button
               class="rounded-2xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-indigo-400"
-              data-action="new"
+              data-action="nuevo"
             >
               Nueva partida
             </button>
             <button
               class="rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5"
-              data-action="resume"
+              data-action="cargar"
             >
               Cargar partida
             </button>
             <div class="rounded-2xl bg-slate-50 p-3 shadow-inner">
-              <label class="text-xs font-semibold text-slate-500" for="saveName">Nombre de la partida</label>
+              <label class="text-xs font-semibold text-slate-500" for="nombreGuardado">Nombre de la partida</label>
               <input
                 class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 focus:border-indigo-300 focus:outline-none"
-                id="saveName"
+                id="nombreGuardado"
                 placeholder="Ej: Reto Antigüedad"
                 type="text"
               />
             </div>
             <button
               class="rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5"
-              data-action="save"
+              data-action="guardar"
             >
               Guardar partida
             </button>
             <button
               class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 shadow-sm transition hover:-translate-y-0.5"
-              data-action="scores"
+              data-action="puntajes"
             >
               Puntajes
             </button>
           </div>
-          <p class="mt-6 text-xs font-medium text-slate-400" id="saveStatus">
+          <p class="mt-6 text-xs font-medium text-slate-400" id="estadoGuardado">
             No hay partida guardada.
           </p>
           <div class="mt-4">
             <p class="text-xs font-semibold text-slate-500">Partidas guardadas</p>
-            <div class="mt-2 flex flex-col gap-2" id="saveList"></div>
+            <div class="mt-2 flex flex-col gap-2" id="listaGuardados"></div>
           </div>
         </aside>
 
@@ -163,42 +163,42 @@
             <div>
               <p
                 class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400"
-                id="periodLabel"
+                id="etiquetaCategoria"
               >
                 Selecciona una categoría
               </p>
-              <h2 class="mt-1 text-2xl font-semibold text-slate-800" id="levelLabel">Reto actual</h2>
+              <h2 class="mt-1 text-2xl font-semibold text-slate-800" id="etiquetaNivel">Reto actual</h2>
             </div>
             <div class="flex gap-3">
               <div
                 class="rounded-2xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-500 shadow-sm"
               >
-                Vidas <span class="ml-1 text-slate-700" id="lives">3</span>
+                Vidas <span class="ml-1 text-slate-700" id="vidas">3</span>
               </div>
               <div
                 class="rounded-2xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-500 shadow-sm"
               >
-                Puntaje <span class="ml-1 text-slate-700" id="score">0</span>
+                Puntaje <span class="ml-1 text-slate-700" id="puntaje">0</span>
               </div>
             </div>
           </div>
 
           <div
             class="anim-aparecer mt-6 rounded-3xl bg-slate-50 p-6 shadow-inner transition-colors duration-300"
-            id="questionCard"
+            id="tarjetaPregunta"
           >
-            <p class="text-base font-medium text-slate-700" id="questionText">
+            <p class="text-base font-medium text-slate-700" id="textoPregunta">
               Selecciona una opción para comenzar el reto histórico.
             </p>
-            <div class="mt-4 grid gap-3 sm:grid-cols-2" id="options"></div>
+            <div class="mt-4 grid gap-3 sm:grid-cols-2" id="opciones"></div>
           </div>
 
           <div
             class="anim-aparecer mt-4 flex items-center gap-3 rounded-3xl bg-slate-50 p-4 shadow-inner transition-colors duration-300"
-            id="feedback"
+            id="retroalimentacion"
           >
             <span class="text-lg">✨</span>
-            <p class="text-sm text-slate-600" id="feedbackText">Elige un reto para iniciar.</p>
+            <p class="text-sm text-slate-600" id="textoFeedback">Elige un reto para iniciar.</p>
           </div>
         </main>
       </section>
@@ -210,7 +210,7 @@
             Explora mínimo 5 categorías con 20+ preguntas cada una.
           </p>
         </div>
-        <div class="mt-4 grid gap-4 md:grid-cols-3" id="periods"></div>
+        <div class="mt-4 grid gap-4 md:grid-cols-3" id="categorias"></div>
       </section>
 
       <section class="rounded-3xl bg-white p-6 shadow-lg transition-colors duration-300">
@@ -1092,7 +1092,7 @@
         document.querySelectorAll("[data-action]").forEach((boton) => {
           boton.addEventListener("click", () => {
             const accion = boton.dataset.action;
-            if (accion === "new") {
+            if (accion === "nuevo") {
               estado.indicePreguntaActual = 0;
               estado.vidas = 3;
               estado.puntaje = 0;
@@ -1100,15 +1100,15 @@
               guardarPartida();
               estadoGuardado.textContent = "Nueva partida iniciada.";
             }
-            if (accion === "resume") {
+            if (accion === "cargar") {
               if (cargarPartida()) {
                 actualizarJuego();
               }
             }
-            if (accion === "save") {
+            if (accion === "guardar") {
               guardarPartida();
             }
-            if (accion === "scores") {
+            if (accion === "puntajes") {
               estadoGuardado.textContent = `Puntaje actual: ${estado.puntaje}`;
             }
           });
@@ -1116,17 +1116,17 @@
       }
 
       document.addEventListener("DOMContentLoaded", () => {
-        contenedorCategorias = document.getElementById("periods");
-        etiquetaCategoria = document.getElementById("periodLabel");
-        etiquetaNivel = document.getElementById("levelLabel");
-        etiquetaVidas = document.getElementById("lives");
-        etiquetaPuntaje = document.getElementById("score");
-        textoPregunta = document.getElementById("questionText");
-        contenedorOpciones = document.getElementById("options");
-        textoFeedback = document.getElementById("feedbackText");
-        estadoGuardado = document.getElementById("saveStatus");
-        entradaNombre = document.getElementById("saveName");
-        listaGuardados = document.getElementById("saveList");
+        contenedorCategorias = document.getElementById("categorias");
+        etiquetaCategoria = document.getElementById("etiquetaCategoria");
+        etiquetaNivel = document.getElementById("etiquetaNivel");
+        etiquetaVidas = document.getElementById("vidas");
+        etiquetaPuntaje = document.getElementById("puntaje");
+        textoPregunta = document.getElementById("textoPregunta");
+        contenedorOpciones = document.getElementById("opciones");
+        textoFeedback = document.getElementById("textoFeedback");
+        estadoGuardado = document.getElementById("estadoGuardado");
+        entradaNombre = document.getElementById("nombreGuardado");
+        listaGuardados = document.getElementById("listaGuardados");
 
         renderizarCategorias();
         enlazarMenu();
