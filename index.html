@@ -127,6 +127,15 @@
             >
               Cargar partida
             </button>
+            <div class="rounded-2xl bg-slate-50 p-3 shadow-inner">
+              <label class="text-xs font-semibold text-slate-500" for="saveName">Nombre de la partida</label>
+              <input
+                class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 focus:border-indigo-300 focus:outline-none"
+                id="saveName"
+                placeholder="Ej: Reto Antigüedad"
+                type="text"
+              />
+            </div>
             <button
               class="rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5"
               data-action="save"
@@ -143,6 +152,10 @@
           <p class="mt-6 text-xs font-medium text-slate-400" id="saveStatus">
             No hay partida guardada.
           </p>
+          <div class="mt-4">
+            <p class="text-xs font-semibold text-slate-500">Partidas guardadas</p>
+            <div class="mt-2 flex flex-col gap-2" id="saveList"></div>
+          </div>
         </aside>
 
         <main class="rounded-3xl bg-white p-6 shadow-lg transition-colors duration-300">
@@ -230,6 +243,7 @@
       */
 
       const CLAVE_GUARDADO = "historia-save";
+      const CLAVE_LISTA_GUARDADOS = "historia-guardadas";
 
       const estado = {
         categorias: [
@@ -884,6 +898,8 @@
       let contenedorOpciones;
       let textoFeedback;
       let estadoGuardado;
+      let entradaNombre;
+      let listaGuardados;
 
       function renderizarCategorias() {
         contenedorCategorias.innerHTML = "";
@@ -970,7 +986,24 @@
         actualizarPregunta();
       }
 
+      function obtenerGuardados() {
+        const guardados = localStorage.getItem(CLAVE_LISTA_GUARDADOS);
+        return guardados ? JSON.parse(guardados) : [];
+      }
+
+      function guardarLista(guardados) {
+        localStorage.setItem(CLAVE_LISTA_GUARDADOS, JSON.stringify(guardados));
+      }
+
       function guardarPartida() {
+        const nombre = entradaNombre?.value?.trim();
+        if (!nombre) {
+          const categoria = estado.categorias[estado.indiceCategoriaActual]?.nombre ?? "Partida";
+          const fecha = new Date().toLocaleDateString();
+          entradaNombre.value = `${categoria} - ${fecha}`;
+          estadoGuardado.textContent = "Escribe un nombre para guardar la partida.";
+          return;
+        }
         const datos = {
           indiceCategoriaActual: estado.indiceCategoriaActual,
           indicePreguntaActual: estado.indicePreguntaActual,
@@ -978,7 +1011,24 @@
           puntaje: estado.puntaje,
         };
         localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(datos));
+
+        const guardados = obtenerGuardados();
+        const existente = guardados.find((item) => item.nombre === nombre);
+        const registro = {
+          id: existente?.id ?? crypto.randomUUID(),
+          nombre,
+          fecha: new Date().toLocaleString(),
+          datos,
+        };
+        if (existente) {
+          guardados.splice(guardados.indexOf(existente), 1, registro);
+        } else {
+          guardados.unshift(registro);
+        }
+        guardarLista(guardados);
+        renderizarGuardados();
         estadoGuardado.textContent = "Partida guardada correctamente.";
+        entradaNombre.value = "";
       }
 
       function cargarPartida() {
@@ -994,6 +1044,48 @@
         estado.puntaje = datos.puntaje ?? 0;
         estadoGuardado.textContent = "Partida cargada.";
         return true;
+      }
+
+      function cargarPartidaPorId(id) {
+        const guardados = obtenerGuardados();
+        const registro = guardados.find((item) => item.id === id);
+        if (!registro) {
+          estadoGuardado.textContent = "No se encontró la partida.";
+          return;
+        }
+        estado.indiceCategoriaActual = registro.datos.indiceCategoriaActual ?? 0;
+        estado.indicePreguntaActual = registro.datos.indicePreguntaActual ?? 0;
+        estado.vidas = registro.datos.vidas ?? 3;
+        estado.puntaje = registro.datos.puntaje ?? 0;
+        localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(registro.datos));
+        estadoGuardado.textContent = `Partida cargada: ${registro.nombre}`;
+        actualizarJuego();
+      }
+
+      function renderizarGuardados() {
+        if (!listaGuardados) {
+          return;
+        }
+        const guardados = obtenerGuardados();
+        listaGuardados.innerHTML = "";
+        if (guardados.length === 0) {
+          const vacio = document.createElement("p");
+          vacio.className = "text-xs text-slate-400";
+          vacio.textContent = "Sin partidas guardadas.";
+          listaGuardados.appendChild(vacio);
+          return;
+        }
+        guardados.forEach((registro) => {
+          const boton = document.createElement("button");
+          boton.className =
+            "rounded-xl border border-slate-200 bg-white px-3 py-2 text-left text-xs font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5";
+          boton.innerHTML = `
+            <span>${registro.nombre}</span>
+            <span class="block text-[10px] text-slate-400">${registro.fecha}</span>
+          `;
+          boton.addEventListener("click", () => cargarPartidaPorId(registro.id));
+          listaGuardados.appendChild(boton);
+        });
       }
 
       function enlazarMenu() {
@@ -1033,10 +1125,13 @@
         contenedorOpciones = document.getElementById("options");
         textoFeedback = document.getElementById("feedbackText");
         estadoGuardado = document.getElementById("saveStatus");
+        entradaNombre = document.getElementById("saveName");
+        listaGuardados = document.getElementById("saveList");
 
         renderizarCategorias();
         enlazarMenu();
         actualizarJuego();
+        renderizarGuardados();
       });
     </script>
   </body>
