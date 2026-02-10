@@ -147,6 +147,16 @@ El proyecto generará un impacto positivo al:
 | Desarrollo | Programación del juego | 3 semanas |
 | Pruebas | Corrección de errores y validación | 2 semanas |
 
+
+## Cambios recientes (flujo oficial)
+- La versión web ahora abre con un **menú de inicio** superpuesto (fondo difuminado):
+  - **Nueva partida**: abre un formulario de configuración (nombre, categoría y dificultad) antes de empezar.
+  - **Gestor de partidas**: muestra partidas guardadas con nombre, fecha, puntaje máximo, dificultad, respuestas correctas/incorrectas y botón **Continuar partida**.
+- Durante la partida, en el menú lateral ya no se propone iniciar otra partida directamente; se usa **Terminar partida** para volver al menú inicial y **Guardar partida** para persistir progreso.
+- Se reforzó el anti-cheat web:
+  - Bloqueo de selección de texto, menú contextual y acciones de copiar/cortar/pegar por defecto.
+  - El comodín **Investigar 10s** desbloquea temporalmente estas restricciones y luego se restauran.
+
 ## Cómo ejecutar el juego
 1. Asegúrate de tener Python 3.10 o superior instalado.
 2. Ejecuta el juego desde la terminal:
