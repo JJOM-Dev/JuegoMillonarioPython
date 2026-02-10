@@ -523,29 +523,51 @@
       }
 
 
-      #overlayNuevaPartida .theme-panel {
+      body:not([data-theme="hardcore"]) #overlayNuevaPartida .theme-panel {
+        background: rgba(255, 255, 255, 0.95) !important;
+        color: #0f172a !important;
+      }
+
+      body:not([data-theme="hardcore"]) #overlayNuevaPartida input,
+      body:not([data-theme="hardcore"]) #overlayNuevaPartida select {
+        color: #334155 !important;
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        border-color: rgba(148, 163, 184, 0.45) !important;
+      }
+
+      body:not([data-theme="hardcore"]) #overlayNuevaPartida input::placeholder {
+        color: rgba(100, 116, 139, 0.95) !important;
+      }
+
+      body[data-theme="hardcore"] #overlayNuevaPartida .theme-panel {
         background: rgba(9, 14, 25, 0.97) !important;
         color: #f8fafc !important;
       }
 
-      #overlayNuevaPartida input,
-      #overlayNuevaPartida select {
+      body[data-theme="hardcore"] #overlayNuevaPartida input,
+      body[data-theme="hardcore"] #overlayNuevaPartida select {
         color: #f8fafc !important;
         background-color: rgba(30, 41, 59, 0.9) !important;
         border-color: rgba(148, 163, 184, 0.35) !important;
       }
 
-      #overlayNuevaPartida input::placeholder {
+      body[data-theme="hardcore"] #overlayNuevaPartida input::placeholder {
         color: rgba(226, 232, 240, 0.7) !important;
       }
 
       .dificultad-resumen {
-        border: 1px solid rgba(148, 163, 184, 0.32);
-        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        background: rgba(248, 250, 252, 0.95);
         border-radius: 1rem;
         padding: 0.8rem;
         min-height: 138px;
         transition: opacity 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+      }
+
+
+      body[data-theme="hardcore"] .dificultad-resumen {
+        border-color: rgba(148, 163, 184, 0.32);
+        background: rgba(15, 23, 42, 0.7);
       }
 
       .dificultad-resumen.animando {
@@ -741,7 +763,7 @@
 
     <div class="overlay-inicio oculto" id="overlayNuevaPartida">
       <div class="theme-panel w-full max-w-xl rounded-3xl bg-white/95 p-6 shadow-2xl">
-        <h3 class="text-xl font-bold text-slate-100">Configurar nueva partida</h3>
+        <h3 class="text-xl font-bold text-slate-900">Configurar nueva partida</h3>
         <div class="mt-4 space-y-3">
           <input class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" id="inicioNombrePartida" placeholder="Nombre de partida" type="text"/>
           <div class="rounded-2xl border border-slate-200 bg-white/90 p-3 tarjeta-transicion">
@@ -749,7 +771,7 @@
             <select class="w-full rounded-xl border border-indigo-100 bg-gradient-to-r from-indigo-50 to-blue-50 px-3 py-3 text-sm font-semibold text-slate-700 shadow-sm focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200" id="inicioCategoria"></select>
             <p class="mt-2 text-[11px] text-slate-500">Elige la categoría histórica para comenzar la partida.</p>
           </div>
-          <label class="text-xs font-bold uppercase tracking-[0.2em] text-slate-300">Dificultad</label>
+          <label class="text-xs font-bold uppercase tracking-[0.2em] text-slate-600">Dificultad</label>
           <div class="inicio-slider tarjeta-transicion">
             <p class="inicio-dificultad-badge" id="inicioDificultadNombre">Normal</p>
             <div class="inicio-dificultad-track">
@@ -2398,8 +2420,8 @@
         inicioDificultadResumen.classList.add("animando");
         setTimeout(() => {
           inicioDificultadResumen.innerHTML = `
-            <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-300">Resumen del modo ${etiqueta}</p>
-            <ul class="mt-2 space-y-1 text-xs text-slate-200">
+            <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-600">Resumen del modo ${etiqueta}</p>
+            <ul class="mt-2 space-y-1 text-xs text-slate-700">
               <li>• Vidas iniciales: <span class="font-semibold">${vidasTexto}</span></li>
               <li>• Tiempo por pregunta: <span class="font-semibold">${cfg.tiempoPregunta}s</span></li>
               <li>• Preguntas especiales: <span class="font-semibold">${porcentajeEspecial}%</span> (${especial})</li>
