@@ -551,6 +551,17 @@
         border-color: rgba(148, 163, 184, 0.35) !important;
       }
 
+      body[data-theme="hardcore"] #overlayNuevaPartida #inicioCategoria {
+        color: #334155 !important;
+        background: linear-gradient(90deg, #eef2ff 0%, #e0f2fe 100%) !important;
+        border-color: rgba(148, 163, 184, 0.45) !important;
+      }
+
+      body[data-theme="hardcore"] #overlayNuevaPartida #inicioCategoria option {
+        color: #334155 !important;
+        background: #ffffff !important;
+      }
+
       body[data-theme="hardcore"] #overlayNuevaPartida input::placeholder {
         color: rgba(226, 232, 240, 0.7) !important;
       }
@@ -721,13 +732,7 @@
             </main>
       </section>
 
-      <section class="theme-panel animar-entrada tarjeta-transicion rounded-3xl bg-white/90 p-6 shadow-xl transition-colors duration-300">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <h2 class="text-lg font-semibold text-slate-800">Categorías Disponibles</h2>
-          <p class="text-xs text-slate-400">
-            Explora mínimo 5 categorías con 20+ preguntas cada una.
-          </p>
-        </div>
+      <section class="hidden" id="seccionCategorias" aria-hidden="true">
         <div class="mt-4 grid gap-4 md:grid-cols-3" id="categorias"></div>
       </section>
 
@@ -2272,24 +2277,15 @@
       // Renderiza las tarjetas de categorías según el estado actual.
       function renderizarCategorias() {
         contenedorCategorias.innerHTML = "";
-        estado.categorias.forEach((categoria, indice) => {
-          const tarjeta = document.createElement("button");
+        estado.categorias.forEach((categoria) => {
+          const tarjeta = document.createElement("div");
           tarjeta.className =
-            "theme-card card-categoria tarjeta-transicion rounded-2xl bg-slate-50 p-4 text-left shadow-inner transition hover:-translate-y-1 hover:shadow-md";
+            "theme-card card-categoria tarjeta-transicion rounded-2xl bg-slate-50 p-4 text-left shadow-inner";
           tarjeta.innerHTML = `
             <p class="text-sm font-semibold text-slate-800">${categoria.nombre}</p>
             <p class="text-xs text-slate-400">${categoria.descripcion}</p>
             <p class="mt-2 text-xs text-indigo-500 font-semibold">${obtenerTotalPreguntas(categoria)} preguntas</p>
           `;
-          tarjeta.addEventListener("click", () => {
-            estado.indiceCategoriaActual = indice;
-            estado.indicePreguntaActual = 0;
-            estado.vidas = estado.configuracion.vidasIniciales;
-            estado.puntaje = 0;
-            estado.ordenPreguntas = obtenerOrdenAleatorio(obtenerTotalPreguntas(categoria));
-            actualizarJuego();
-            guardarPartida();
-          });
           contenedorCategorias.appendChild(tarjeta);
         });
         if (window.gsap) {
@@ -2447,8 +2443,9 @@
         inicioDificultadNombre.style.setProperty("--badge-color", color);
         inicioDificultadNombre.style.color = nivel === "principiante" ? "#111827" : "#f8fafc";
         if (inicioDificultadFill) {
+          const colorBarra = nivel === "hardcore" ? "#ffffff" : color;
           inicioDificultadFill.style.width = `${porcentaje}%`;
-          inicioDificultadFill.style.backgroundColor = color;
+          inicioDificultadFill.style.backgroundColor = colorBarra;
         }
         inicioDificultad.style.accentColor = color;
         inicioDificultad.style.setProperty("--slider-color", color);
