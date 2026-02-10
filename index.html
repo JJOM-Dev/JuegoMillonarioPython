@@ -633,7 +633,8 @@
           <input class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" id="inicioNombrePartida" placeholder="Nombre de partida" type="text"/>
           <select class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" id="inicioCategoria"></select>
           <label class="text-xs text-slate-500">Dificultad</label>
-          <input id="inicioDificultad" max="4" min="0" step="1" type="range" value="2" class="w-full"/>
+          <input id="inicioDificultad" max="4" min="0" step="1" type="range" value="2" class="w-full accent-indigo-500 transition-colors duration-500"/>
+          <p class="text-xs font-semibold text-slate-600 transition-colors duration-500" id="inicioDificultadNombre">Normal</p>
         </div>
         <div class="mt-4 flex gap-3">
           <button class="rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white" id="botonIniciarPartida">Iniciar partida</button>
@@ -1978,6 +1979,7 @@
       let inicioDificultad;
       let listaGuardadosGestor;
       let botonTerminarPartida;
+      let inicioDificultadNombre;
       let seguridadDesbloqueada = false;
 
 
@@ -2021,6 +2023,7 @@
 
       function iniciarPartidaDesdeMenu() {
         const nivel = NIVELES_DIFICULTAD[Number(inicioDificultad.value)] ?? "normal";
+        actualizarSelectorInicioDificultad();
         const categoriaSeleccionada = Number(inicioCategoria.value || 0);
         aplicarDificultad(nivel);
         estado.indiceCategoriaActual = categoriaSeleccionada;
@@ -2169,6 +2172,39 @@
         return etiquetas[nivel] ?? "Normal";
       }
 
+      function obtenerColorDificultad(nivel) {
+        const colores = {
+          principiante: "#f59e0b",
+          facil: "#22c55e",
+          normal: "#6366f1",
+          dificil: "#ef4444",
+          hardcore: "#22d3ee",
+        };
+        return colores[nivel] ?? "#6366f1";
+      }
+
+      function actualizarSelectorInicioDificultad() {
+        if (!inicioDificultad || !inicioDificultadNombre) {
+          return;
+        }
+        const nivel = NIVELES_DIFICULTAD[Number(inicioDificultad.value)] ?? "normal";
+        const etiqueta = obtenerEtiquetaDificultad(nivel);
+        const color = obtenerColorDificultad(nivel);
+        inicioDificultadNombre.textContent = etiqueta;
+        inicioDificultadNombre.style.color = color;
+        inicioDificultad.style.accentColor = color;
+      }
+
+      function mezclarArreglo(lista) {
+        const copia = [...lista];
+        for (let i = copia.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copia[i], copia[j]] = [copia[j], copia[i]];
+        }
+        return copia;
+      }
+
+
       // Sincroniza slider, burbuja y tema visual con la dificultad actual.
       function actualizarSliderDificultad(nivel) {
         const indice = NIVELES_DIFICULTAD.includes(nivel) ? NIVELES_DIFICULTAD.indexOf(nivel) : 2;
@@ -2231,7 +2267,8 @@
         }
         textoPregunta.textContent = pregunta.enunciado;
         contenedorOpciones.innerHTML = "";
-        pregunta.opciones.forEach((opcion) => {
+        const opcionesAleatorias = mezclarArreglo(pregunta.opciones);
+        opcionesAleatorias.forEach((opcion) => {
           const boton = document.createElement("button");
           boton.className =
             "rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:text-indigo-600";
@@ -2322,6 +2359,7 @@
           preguntaEspecial: estado.preguntaEspecial,
           comodines: estado.comodines,
           dificultad: estado.dificultad,
+          vidasDisponibles: estado.vidas,
           respuestasCorrectas: estado.respuestasCorrectas,
           respuestasIncorrectas: estado.respuestasIncorrectas,
         };
@@ -2442,7 +2480,7 @@
             <div class="flex items-center justify-between gap-2">
               <div>
                 <span>${registro.nombre}</span>
-                <span class="block text-[10px] text-slate-400">${registro.fecha} · ${registro.dificultad ?? "Normal"}</span>
+                <span class="block text-[10px] text-slate-400">Última vez: ${registro.fecha} · ${registro.dificultad ?? "Normal"}</span>
               </div>
               <span class="rounded-full bg-indigo-100 px-2 py-1 text-[10px] font-semibold text-indigo-600">
                 Máx ${registro.maximoPuntaje}
@@ -2457,9 +2495,10 @@
             tarjeta.className = "theme-card rounded-2xl border border-slate-200 bg-white/90 p-4 text-sm";
             tarjeta.innerHTML = `
               <p class="font-semibold text-slate-800">${registro.nombre}</p>
-              <p class="text-xs text-slate-500">${registro.fecha}</p>
-              <p class="mt-1 text-xs text-slate-600">Dificultad: ${registro.dificultad ?? "Normal"}</p>
+              <p class="text-xs text-slate-600">Última vez jugado: ${registro.fecha}</p>
+              <p class="text-xs text-slate-600">Dificultad: ${registro.dificultad ?? "Normal"}</p>
               <p class="text-xs text-slate-600">Puntaje máximo: ${registro.maximoPuntaje}</p>
+              <p class="text-xs text-slate-600">Vidas disponibles: ${registro.datos?.vidas ?? 0}</p>
               <p class="text-xs text-slate-600">Correctas: ${correctas} · Incorrectas: ${incorrectas}</p>
               <button class="mt-3 rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white" data-id="${registro.id}">Continuar partida</button>
             `;
@@ -2752,6 +2791,7 @@
         inicioNombrePartida = document.getElementById("inicioNombrePartida");
         inicioCategoria = document.getElementById("inicioCategoria");
         inicioDificultad = document.getElementById("inicioDificultad");
+        inicioDificultadNombre = document.getElementById("inicioDificultadNombre");
         listaGuardadosGestor = document.getElementById("listaGuardadosGestor");
         botonTerminarPartida = document.getElementById("botonTerminarPartida");
 
@@ -2797,6 +2837,8 @@
         document.getElementById("botonAbrirGestor").addEventListener("click", abrirGestorPartidas);
         document.getElementById("botonCerrarGestor").addEventListener("click", () => mostrarSoloOverlay(overlayInicio));
         document.getElementById("botonIniciarPartida").addEventListener("click", iniciarPartidaDesdeMenu);
+        inicioDificultad.addEventListener("input", actualizarSelectorInicioDificultad);
+        actualizarSelectorInicioDificultad();
 
         ["contextmenu", "copy", "cut", "paste", "selectstart"].forEach((evento) => {
           document.addEventListener(evento, bloquearEventosSeguridad);
