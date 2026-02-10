@@ -181,14 +181,14 @@
       }
 
       body[data-theme="hardcore"] {
-        --page-bg: linear-gradient(135deg, #050505 0%, #111827 50%, #0f172a 100%);
-        --panel-bg: rgba(17, 24, 39, 0.92);
-        --card-bg: rgba(30, 41, 59, 0.9);
-        --chip-bg: rgba(15, 23, 42, 0.92);
+        --page-bg: linear-gradient(135deg, #000000 0%, #000000 55%, #050505 100%);
+        --panel-bg: rgba(10, 10, 10, 0.94);
+        --card-bg: rgba(22, 22, 22, 0.94);
+        --chip-bg: rgba(0, 0, 0, 0.92);
         --text-color: #f8fafc;
         --muted-color: #e2e8f0;
-        --accent: #22d3ee;
-        --accent-soft: rgba(34, 211, 238, 0.2);
+        --accent: #000000;
+        --accent-soft: rgba(0, 0, 0, 0.28);
         --panel-shadow: 0 24px 60px rgba(15, 23, 42, 0.45);
       }
 
@@ -521,6 +521,37 @@
       #inicioDificultad:active::-moz-range-thumb {
         transform: scale(1.08);
       }
+
+
+      #overlayNuevaPartida .theme-panel {
+        background: rgba(9, 14, 25, 0.97) !important;
+        color: #f8fafc !important;
+      }
+
+      #overlayNuevaPartida input,
+      #overlayNuevaPartida select {
+        color: #f8fafc !important;
+        background-color: rgba(30, 41, 59, 0.9) !important;
+        border-color: rgba(148, 163, 184, 0.35) !important;
+      }
+
+      #overlayNuevaPartida input::placeholder {
+        color: rgba(226, 232, 240, 0.7) !important;
+      }
+
+      .dificultad-resumen {
+        border: 1px solid rgba(148, 163, 184, 0.32);
+        background: rgba(15, 23, 42, 0.7);
+        border-radius: 1rem;
+        padding: 0.8rem;
+        min-height: 138px;
+        transition: opacity 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+      }
+
+      .dificultad-resumen.animando {
+        opacity: 0.4;
+        transform: translateY(5px);
+      }
     </style>
   </head>
   <body
@@ -621,39 +652,6 @@
               </div>
             </div>
           </div>
-          <div class="mt-4 hidden flex-col gap-3" id="panelDificultadJuego">
-            <div class="flex flex-wrap items-center gap-3">
-              <label class="text-xs font-semibold text-slate-500" for="selectorDificultad">Dificultad</label>
-              <div class="dificultad-slider">
-                <div class="dificultad-burbuja" id="burbujaDificultad">Normal</div>
-                <div class="dificultad-track">
-                  <div class="dificultad-fill" id="rellenoDificultad"></div>
-                  <span class="dificultad-point" style="left: 0%"></span>
-                  <span class="dificultad-point" style="left: 25%"></span>
-                  <span class="dificultad-point" style="left: 50%"></span>
-                  <span class="dificultad-point" style="left: 75%"></span>
-                  <span class="dificultad-point" style="left: 100%"></span>
-                </div>
-                <input
-                  aria-label="Selector de dificultad"
-                  id="selectorDificultad"
-                  max="4"
-                  min="0"
-                  step="1"
-                  type="range"
-                  value="2"
-                />
-              </div>
-            </div>
-            <p class="text-xs text-slate-400" id="textoDificultad">Modo normal activado.</p>
-            <div class="leyenda-dificultad grid gap-1 text-xs">
-              <p><span class="font-semibold">Principiante:</span> sin límite de vidas, ideal para practicar.</p>
-              <p><span class="font-semibold">Fácil:</span> más vidas y tiempo extendido para aprender.</p>
-              <p><span class="font-semibold">Normal:</span> equilibrio entre reto, tiempo y comodines.</p>
-              <p><span class="font-semibold">Difícil:</span> menos margen y preguntas extra avanzadas.</p>
-              <p><span class="font-semibold">Hardcore:</span> solo expertos, errores reinician la ronda.</p>
-            </div>
-          </div>
 
           <div
             class="theme-card anim-aparecer mt-6 rounded-3xl bg-slate-50/80 p-6 shadow-inner transition-colors duration-300"
@@ -672,7 +670,7 @@
             <span class="text-lg">✨</span>
             <p class="text-sm text-slate-600" id="textoFeedback">Elige un reto para iniciar.</p>
           </div>
-              <div class="mt-4 flex flex-wrap gap-2">
+              <div class="mt-4 flex flex-wrap gap-2" id="panelComodines">
                 <button
                   class="rounded-2xl border border-indigo-200 bg-white px-4 py-2 text-xs font-semibold text-indigo-600 shadow-sm transition hover:-translate-y-0.5 disabled:opacity-50"
                   id="comodinPista"
@@ -743,7 +741,7 @@
 
     <div class="overlay-inicio oculto" id="overlayNuevaPartida">
       <div class="theme-panel w-full max-w-xl rounded-3xl bg-white/95 p-6 shadow-2xl">
-        <h3 class="text-xl font-bold text-slate-900">Configurar nueva partida</h3>
+        <h3 class="text-xl font-bold text-slate-100">Configurar nueva partida</h3>
         <div class="mt-4 space-y-3">
           <input class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" id="inicioNombrePartida" placeholder="Nombre de partida" type="text"/>
           <div class="rounded-2xl border border-slate-200 bg-white/90 p-3 tarjeta-transicion">
@@ -751,7 +749,7 @@
             <select class="w-full rounded-xl border border-indigo-100 bg-gradient-to-r from-indigo-50 to-blue-50 px-3 py-3 text-sm font-semibold text-slate-700 shadow-sm focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200" id="inicioCategoria"></select>
             <p class="mt-2 text-[11px] text-slate-500">Elige la categoría histórica para comenzar la partida.</p>
           </div>
-          <label class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Dificultad</label>
+          <label class="text-xs font-bold uppercase tracking-[0.2em] text-slate-300">Dificultad</label>
           <div class="inicio-slider tarjeta-transicion">
             <p class="inicio-dificultad-badge" id="inicioDificultadNombre">Normal</p>
             <div class="inicio-dificultad-track">
@@ -766,6 +764,7 @@
               <input id="inicioDificultad" max="4" min="0" step="1" type="range" value="2" class="w-full"/>
             </div>
           </div>
+          <div class="dificultad-resumen" id="inicioDificultadResumen"></div>
         </div>
         <div class="mt-4 flex gap-3">
           <button class="rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white" id="botonIniciarPartida">Iniciar partida</button>
@@ -2112,7 +2111,10 @@
       let botonTerminarPartida;
       let inicioDificultadNombre;
       let inicioDificultadFill;
+      let inicioDificultadResumen;
+      let panelComodines;
       let seguridadDesbloqueada = false;
+      let overlayActual = null;
 
 
       function activarBloqueoSeguridad() {
@@ -2139,32 +2141,82 @@
         evento.preventDefault();
       }
 
-      function animarOverlay(overlay) {
+      function animarOverlay(overlay, { direccion = 1, saliendo = false } = {}) {
         if (!overlay || !window.gsap) {
           return;
         }
         const panel = overlay.querySelector(".theme-panel");
-        gsap.fromTo(
-          panel,
-          { y: 18, opacity: 0.7, scale: 0.98 },
-          { y: 0, opacity: 1, scale: 1, duration: 0.35, ease: "power2.out" }
-        );
+        if (saliendo) {
+          gsap.to(panel, {
+            x: -80 * direccion,
+            opacity: 0,
+            duration: 0.22,
+            ease: "power1.in",
+          });
+          return;
+        }
+        gsap.fromTo(panel, { x: 80 * direccion, opacity: 0 }, { x: 0, opacity: 1, duration: 0.32, ease: "power2.out" });
+      }
+
+      function obtenerDireccionTransicion(origen, destino) {
+        if (!origen || !destino || origen === destino) {
+          return 1;
+        }
+        if (origen === overlayInicio && (destino === overlayNuevaPartida || destino === overlayGestorPartidas)) {
+          return 1;
+        }
+        if ((origen === overlayNuevaPartida || origen === overlayGestorPartidas) && destino === overlayInicio) {
+          return -1;
+        }
+        if (origen === overlayNuevaPartida && destino === overlayGestorPartidas) {
+          return 1;
+        }
+        if (origen === overlayGestorPartidas && destino === overlayNuevaPartida) {
+          return -1;
+        }
+        return 1;
       }
 
       function mostrarSoloOverlay(overlayActivo) {
+        const direccion = obtenerDireccionTransicion(overlayActual, overlayActivo);
+        const anterior = overlayActual;
         [overlayInicio, overlayNuevaPartida, overlayGestorPartidas].forEach((overlay) => {
-          overlay.classList.toggle("oculto", overlay !== overlayActivo);
+          if (overlay !== anterior && overlay !== overlayActivo) {
+            overlay.classList.add("oculto");
+          }
         });
+        if (anterior && anterior !== overlayActivo && overlayActivo) {
+          animarOverlay(anterior, { direccion, saliendo: true });
+          setTimeout(() => {
+            if (overlayActual !== anterior) {
+              anterior.classList.add("oculto");
+            }
+          }, 220);
+        } else if (anterior && anterior !== overlayActivo) {
+          anterior.classList.add("oculto");
+        }
         if (overlayActivo) {
-          animarOverlay(overlayActivo);
+          overlayActivo.classList.remove("oculto");
+          animarOverlay(overlayActivo, { direccion });
+        }
+        overlayActual = overlayActivo;
+      }
+
+      function resetearTemaMenuInicio() {
+        document.body.dataset.theme = "normal";
+        if (inicioDificultad) {
+          inicioDificultad.value = "2";
+          actualizarSelectorInicioDificultad();
         }
       }
 
       function volverAlMenuInicio(mensaje = "Volviste al menú de inicio.") {
         estado.partidaIniciada = false;
+        estado.permitirSalidaHasta = 0;
         detenerTemporizador();
         detenerTemporizadorInvestigacion();
         mostrarSoloOverlay(overlayInicio);
+        resetearTemaMenuInicio();
         estadoGuardado.textContent = mensaje;
       }
 
@@ -2328,9 +2380,36 @@
           facil: "#22c55e",
           normal: "#6366f1",
           dificil: "#ef4444",
-          hardcore: "#22d3ee",
+          hardcore: "#000000",
         };
         return colores[nivel] ?? "#6366f1";
+      }
+
+      function renderizarResumenDificultad(nivel) {
+        if (!inicioDificultadResumen) {
+          return;
+        }
+        const cfg = obtenerConfiguracion(nivel);
+        const etiqueta = obtenerEtiquetaDificultad(nivel);
+        const totalComodines = Object.values(cfg.comodines).reduce((acc, v) => acc + v, 0);
+        const porcentajeEspecial = Math.round((cfg.probabilidadEspecial || 0) * 100);
+        const vidasTexto = cfg.vidasIniciales === 0 ? "Infinitas" : String(cfg.vidasIniciales);
+        const especial = cfg.tiempoEspecial > 0 ? `${cfg.tiempoEspecial}s` : "No aplica";
+        inicioDificultadResumen.classList.add("animando");
+        setTimeout(() => {
+          inicioDificultadResumen.innerHTML = `
+            <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-300">Resumen del modo ${etiqueta}</p>
+            <ul class="mt-2 space-y-1 text-xs text-slate-200">
+              <li>• Vidas iniciales: <span class="font-semibold">${vidasTexto}</span></li>
+              <li>• Tiempo por pregunta: <span class="font-semibold">${cfg.tiempoPregunta}s</span></li>
+              <li>• Preguntas especiales: <span class="font-semibold">${porcentajeEspecial}%</span> (${especial})</li>
+              <li>• Comodines totales: <span class="font-semibold">${totalComodines}</span> ${totalComodines === 0 ? "(desactivados)" : ""}</li>
+              <li>• Guardado: <span class="font-semibold">${cfg.puedeGuardar ? "Sí" : "No"}</span></li>
+              <li>• Anti-trampa: <span class="font-semibold">${cfg.antiTrampa ? "Activo" : "Inactivo"}</span></li>
+            </ul>
+          `;
+          inicioDificultadResumen.classList.remove("animando");
+        }, 120);
       }
 
       function actualizarSelectorInicioDificultad() {
@@ -2351,6 +2430,8 @@
         }
         inicioDificultad.style.accentColor = color;
         inicioDificultad.style.setProperty("--slider-color", color);
+        document.body.dataset.theme = nivel;
+        renderizarResumenDificultad(nivel);
       }
 
       function mezclarArreglo(lista) {
@@ -2367,7 +2448,9 @@
       function actualizarSliderDificultad(nivel) {
         const indice = NIVELES_DIFICULTAD.includes(nivel) ? NIVELES_DIFICULTAD.indexOf(nivel) : 2;
         const porcentaje = indice <= 0 ? 0 : (indice / (NIVELES_DIFICULTAD.length - 1)) * 100;
-        selectorDificultad.value = indice;
+        if (selectorDificultad) {
+          selectorDificultad.value = indice;
+        }
         if (rellenoDificultad) {
           rellenoDificultad.style.width = `${porcentaje}%`;
         }
@@ -2404,7 +2487,9 @@
         renderizarCategorias();
         actualizarComodines();
         actualizarEstado();
-        textoDificultad.textContent = `Modo ${obtenerEtiquetaDificultad(nivel)} activado.`;
+        if (textoDificultad) {
+          textoDificultad.textContent = `Modo ${obtenerEtiquetaDificultad(nivel)} activado.`;
+        }
       }
 
       // Genera la siguiente pregunta y pinta las opciones.
@@ -2599,6 +2684,7 @@
           aplicarDificultad(registro.datos.dificultad, { reiniciar: false });
         }
         localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(registro.datos));
+        estado.partidaIniciada = true;
         estadoGuardado.textContent = `Partida cargada: ${registro.nombre}`;
         actualizarJuego();
       }
@@ -2782,6 +2868,7 @@
       }
 
       function perderPartida(mensaje) {
+        estado.partidaIniciada = false;
         textoPregunta.textContent = "Partida perdida.";
         contenedorOpciones.innerHTML = "";
         textoFeedback.textContent = `${mensaje} Debes empezar de cero.`;
@@ -2796,6 +2883,7 @@
         detenerTemporizadorInvestigacion();
         actualizarEstado();
         actualizarComodines();
+        resetearTemaMenuInicio();
         guardarPartida();
       }
 
@@ -2820,10 +2908,14 @@
 
       // Ajusta texto/estado de botones de comodines.
       function actualizarComodines() {
-        botonPista.disabled = estado.comodines.pista <= 0;
-        botonSaltar.disabled = estado.comodines.saltar <= 0;
-        botonInvestigar.disabled = estado.comodines.investigar <= 0;
-        botonEliminar.disabled = estado.comodines.eliminar <= 0;
+        if (panelComodines) {
+          panelComodines.classList.toggle("hidden", !estado.partidaIniciada);
+        }
+        const bloqueado = !estado.partidaIniciada;
+        botonPista.disabled = bloqueado || estado.comodines.pista <= 0;
+        botonSaltar.disabled = bloqueado || estado.comodines.saltar <= 0;
+        botonInvestigar.disabled = bloqueado || estado.comodines.investigar <= 0;
+        botonEliminar.disabled = bloqueado || estado.comodines.eliminar <= 0;
         botonPista.textContent = `Comodín: Pista (${estado.comodines.pista})`;
         botonSaltar.textContent = `Comodín: Saltar (${estado.comodines.saltar})`;
         const etiquetaInvestigar = tiempoInvestigacionRestante > 0 ? `${tiempoInvestigacionRestante}s` : "10s";
@@ -2832,6 +2924,9 @@
       }
 
       function usarComodinPista() {
+        if (!estado.partidaIniciada) {
+          return;
+        }
         if (!estado.comodines.pista) {
           return;
         }
@@ -2845,6 +2940,9 @@
       }
 
       function usarComodinSaltar() {
+        if (!estado.partidaIniciada) {
+          return;
+        }
         if (!estado.comodines.saltar) {
           return;
         }
@@ -2857,6 +2955,9 @@
 
       // Permite salir temporalmente de la pestaña sin penalización.
       function usarComodinInvestigar() {
+        if (!estado.partidaIniciada) {
+          return;
+        }
         if (!estado.comodines.investigar) {
           return;
         }
@@ -2869,6 +2970,9 @@
       }
 
       function usarComodinEliminar() {
+        if (!estado.partidaIniciada) {
+          return;
+        }
         if (!estado.comodines.eliminar || !estado.preguntaActual) {
           return;
         }
@@ -2951,8 +3055,10 @@
         inicioDificultad = document.getElementById("inicioDificultad");
         inicioDificultadNombre = document.getElementById("inicioDificultadNombre");
         inicioDificultadFill = document.getElementById("inicioDificultadFill");
+        inicioDificultadResumen = document.getElementById("inicioDificultadResumen");
         listaGuardadosGestor = document.getElementById("listaGuardadosGestor");
         botonTerminarPartida = document.getElementById("botonTerminarPartida");
+        panelComodines = document.getElementById("panelComodines");
 
         renderizarCategorias();
         inicioCategoria.innerHTML = estado.categorias
@@ -2960,7 +3066,7 @@
           .join("");
         enlazarMenu();
         estado.ordenPreguntas = obtenerOrdenAleatorio(obtenerTotalPreguntas(estado.categorias[0]));
-        aplicarDificultad(NIVELES_DIFICULTAD[Number(selectorDificultad.value)] ?? "normal");
+        aplicarDificultad("normal");
         actualizarJuego();
         renderizarGuardados();
         actualizarComodines();
@@ -2980,16 +3086,6 @@
         botonInvestigar.addEventListener("click", usarComodinInvestigar);
         botonEliminar.addEventListener("click", usarComodinEliminar);
         document.addEventListener("visibilitychange", gestionarSalidaVentana);
-        selectorDificultad.addEventListener("input", () => {
-          const nivel = NIVELES_DIFICULTAD[Number(selectorDificultad.value)] ?? "normal";
-          actualizarSliderDificultad(nivel);
-          textoDificultad.textContent = `Modo ${obtenerEtiquetaDificultad(nivel)} activado.`;
-        });
-        selectorDificultad.addEventListener("change", () => {
-          const nivel = NIVELES_DIFICULTAD[Number(selectorDificultad.value)] ?? "normal";
-          aplicarDificultad(nivel);
-          actualizarJuego();
-        });
 
         document.getElementById("botonAbrirNuevaPartida").addEventListener("click", () => mostrarSoloOverlay(overlayNuevaPartida));
         document.getElementById("botonVolverInicio").addEventListener("click", () => mostrarSoloOverlay(overlayInicio));
