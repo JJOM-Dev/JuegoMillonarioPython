@@ -51,6 +51,34 @@
         display: none;
       }
 
+      body.bloqueo-seguridad {
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      body.bloqueo-seguridad input,
+      body.bloqueo-seguridad textarea,
+      body.bloqueo-seguridad [contenteditable="true"] {
+        user-select: text;
+        -webkit-user-select: text;
+      }
+
+      .overlay-inicio {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: rgba(15, 23, 42, 0.45);
+        backdrop-filter: blur(10px);
+        z-index: 50;
+      }
+
+      .overlay-inicio.oculto {
+        display: none;
+      }
+
       .anim-flotar {
         animation: flotar 3s ease-in-out infinite;
       }
