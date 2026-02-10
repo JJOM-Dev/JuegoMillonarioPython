@@ -22,6 +22,34 @@
         font-family: "Montserrat", sans-serif;
       }
 
+      body.bloqueo-seguridad {
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      body.bloqueo-seguridad input,
+      body.bloqueo-seguridad textarea,
+      body.bloqueo-seguridad [contenteditable="true"] {
+        user-select: text;
+        -webkit-user-select: text;
+      }
+
+      .overlay-inicio {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: rgba(15, 23, 42, 0.45);
+        backdrop-filter: blur(10px);
+        z-index: 50;
+      }
+
+      .overlay-inicio.oculto {
+        display: none;
+      }
+
       .anim-flotar {
         animation: flotar 3s ease-in-out infinite;
       }
@@ -153,14 +181,14 @@
       }
 
       body[data-theme="hardcore"] {
-        --page-bg: linear-gradient(135deg, #050505 0%, #111827 50%, #0f172a 100%);
-        --panel-bg: rgba(17, 24, 39, 0.92);
-        --card-bg: rgba(30, 41, 59, 0.9);
-        --chip-bg: rgba(15, 23, 42, 0.92);
+        --page-bg: linear-gradient(135deg, #000000 0%, #000000 55%, #050505 100%);
+        --panel-bg: rgba(10, 10, 10, 0.94);
+        --card-bg: rgba(22, 22, 22, 0.94);
+        --chip-bg: rgba(0, 0, 0, 0.92);
         --text-color: #f8fafc;
         --muted-color: #e2e8f0;
-        --accent: #22d3ee;
-        --accent-soft: rgba(34, 211, 238, 0.2);
+        --accent: #000000;
+        --accent-soft: rgba(0, 0, 0, 0.28);
         --panel-shadow: 0 24px 60px rgba(15, 23, 42, 0.45);
       }
 
@@ -378,6 +406,185 @@
       body[data-theme="principiante"] .dificultad-burbuja {
         color: #1f2937;
       }
+
+
+      .tarjeta-transicion {
+        transition: transform 0.35s ease, box-shadow 0.35s ease, opacity 0.35s ease;
+      }
+
+      .tarjeta-transicion:hover {
+        transform: translateY(-3px);
+      }
+
+      .inicio-slider {
+        position: relative;
+        padding-top: 3.4rem;
+      }
+
+      .inicio-dificultad-badge {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: 128px;
+        text-align: center;
+        padding: 0.6rem 1rem;
+        border-radius: 1rem;
+        background: var(--badge-color, #111827);
+        color: #f8fafc;
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        transition: background-color 0.4s ease, color 0.4s ease;
+      }
+
+      .inicio-dificultad-badge::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: -8px;
+        transform: translateX(-50%);
+        border-width: 8px 8px 0 8px;
+        border-style: solid;
+        border-color: var(--badge-color, #111827) transparent transparent transparent;
+        transition: border-color 0.4s ease;
+      }
+
+      .inicio-dificultad-track {
+        position: relative;
+        height: 58px;
+        display: flex;
+        align-items: center;
+      }
+
+      .inicio-dificultad-base {
+        position: absolute;
+        inset: 50% 0 auto 0;
+        transform: translateY(-50%);
+        height: 14px;
+        border-radius: 999px;
+        background: #e5e7eb;
+        overflow: hidden;
+      }
+
+      .inicio-dificultad-fill {
+        height: 100%;
+        width: 50%;
+        border-radius: 999px;
+        background: #4a90e2;
+        transition: width 0.4s ease, background-color 0.4s ease;
+      }
+
+      .inicio-dificultad-point {
+        position: absolute;
+        top: 50%;
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+        background: #f8fafc;
+        box-shadow: 0 0 0 2px rgba(248, 250, 252, 0.35);
+        transform: translate(-50%, -50%);
+        z-index: 2;
+      }
+
+      #inicioDificultad {
+        position: relative;
+        width: 100%;
+        appearance: none;
+        background: transparent;
+        z-index: 3;
+      }
+
+      #inicioDificultad::-webkit-slider-thumb {
+        appearance: none;
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background: var(--slider-color, #4a90e2);
+        border: 10px solid #f8fafc;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.22);
+        transition: transform 0.25s ease, background-color 0.4s ease;
+      }
+
+      #inicioDificultad::-moz-range-thumb {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background: var(--slider-color, #4a90e2);
+        border: 10px solid #f8fafc;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.22);
+        transition: transform 0.25s ease, background-color 0.4s ease;
+      }
+
+      #inicioDificultad:active::-webkit-slider-thumb,
+      #inicioDificultad:active::-moz-range-thumb {
+        transform: scale(1.08);
+      }
+
+
+      body:not([data-theme="hardcore"]) #overlayNuevaPartida .theme-panel {
+        background: rgba(255, 255, 255, 0.95) !important;
+        color: #0f172a !important;
+      }
+
+      body:not([data-theme="hardcore"]) #overlayNuevaPartida input,
+      body:not([data-theme="hardcore"]) #overlayNuevaPartida select {
+        color: #334155 !important;
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        border-color: rgba(148, 163, 184, 0.45) !important;
+      }
+
+      body:not([data-theme="hardcore"]) #overlayNuevaPartida input::placeholder {
+        color: rgba(100, 116, 139, 0.95) !important;
+      }
+
+      body[data-theme="hardcore"] #overlayNuevaPartida .theme-panel {
+        background: rgba(9, 14, 25, 0.97) !important;
+        color: #f8fafc !important;
+      }
+
+      body[data-theme="hardcore"] #overlayNuevaPartida input,
+      body[data-theme="hardcore"] #overlayNuevaPartida select {
+        color: #f8fafc !important;
+        background-color: rgba(30, 41, 59, 0.9) !important;
+        border-color: rgba(148, 163, 184, 0.35) !important;
+      }
+
+      body[data-theme="hardcore"] #overlayNuevaPartida #inicioCategoria {
+        color: #334155 !important;
+        background: linear-gradient(90deg, #eef2ff 0%, #e0f2fe 100%) !important;
+        border-color: rgba(148, 163, 184, 0.45) !important;
+      }
+
+      body[data-theme="hardcore"] #overlayNuevaPartida #inicioCategoria option {
+        color: #334155 !important;
+        background: #ffffff !important;
+      }
+
+      body[data-theme="hardcore"] #overlayNuevaPartida input::placeholder {
+        color: rgba(226, 232, 240, 0.7) !important;
+      }
+
+      .dificultad-resumen {
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        background: rgba(248, 250, 252, 0.95);
+        border-radius: 1rem;
+        padding: 0.8rem;
+        min-height: 138px;
+        transition: opacity 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+      }
+
+
+      body[data-theme="hardcore"] .dificultad-resumen {
+        border-color: rgba(148, 163, 184, 0.32);
+        background: rgba(15, 23, 42, 0.7);
+      }
+
+      .dificultad-resumen.animando {
+        opacity: 0.4;
+        transform: translateY(5px);
+      }
     </style>
   </head>
   <body
@@ -385,7 +592,7 @@
     data-theme="normal"
   >
     <div class="mx-auto flex min-h-screen max-w-6xl flex-col gap-8 px-4 py-8">
-      <header class="theme-panel animar-entrada rounded-3xl bg-white/90 p-8 shadow-2xl backdrop-blur transition-colors duration-300">
+      <header class="theme-panel animar-entrada tarjeta-transicion rounded-3xl bg-white/90 p-8 shadow-2xl backdrop-blur transition-colors duration-300">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
@@ -407,22 +614,18 @@
       </header>
 
       <section class="grid gap-6 lg:grid-cols-[260px,1fr]">
-        <aside class="theme-panel animar-entrada rounded-3xl bg-white/90 p-6 shadow-xl transition-colors duration-300">
+        <aside class="theme-panel animar-entrada tarjeta-transicion rounded-3xl bg-white/90 p-6 shadow-xl transition-colors duration-300">
           <h2 class="text-lg font-semibold text-slate-800">Menú Principal</h2>
           <div class="mt-4 flex flex-col gap-3">
+            <p class="text-xs text-slate-500">Partida activa</p>
             <button
               class="rounded-2xl bg-gradient-to-r from-indigo-500 to-blue-500 px-4 py-3 text-sm font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:from-indigo-400 hover:to-blue-400"
-              data-action="nuevo"
+              id="botonTerminarPartida"
+              data-action="terminar"
             >
-              Nueva partida
+              Terminar partida
             </button>
-            <button
-              class="rounded-2xl bg-white/80 px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5"
-              data-action="cargar"
-            >
-              Cargar partida
-            </button>
-            <div class="theme-card rounded-2xl bg-slate-50/80 p-3 shadow-inner">
+                        <div class="theme-card rounded-2xl bg-slate-50/80 p-3 shadow-inner" id="panelNombreGuardado">
               <label class="text-xs font-semibold text-slate-500" for="nombreGuardado">Nombre de la partida</label>
               <input
                 class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 focus:border-indigo-300 focus:outline-none"
@@ -453,7 +656,7 @@
           </div>
         </aside>
 
-        <main class="theme-panel animar-entrada rounded-3xl bg-white/90 p-6 shadow-xl transition-colors duration-300">
+        <main class="theme-panel animar-entrada tarjeta-transicion rounded-3xl bg-white/90 p-6 shadow-xl transition-colors duration-300">
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p
@@ -482,39 +685,6 @@
               </div>
             </div>
           </div>
-          <div class="mt-4 flex flex-col gap-3">
-            <div class="flex flex-wrap items-center gap-3">
-              <label class="text-xs font-semibold text-slate-500" for="selectorDificultad">Dificultad</label>
-              <div class="dificultad-slider">
-                <div class="dificultad-burbuja" id="burbujaDificultad">Normal</div>
-                <div class="dificultad-track">
-                  <div class="dificultad-fill" id="rellenoDificultad"></div>
-                  <span class="dificultad-point" style="left: 0%"></span>
-                  <span class="dificultad-point" style="left: 25%"></span>
-                  <span class="dificultad-point" style="left: 50%"></span>
-                  <span class="dificultad-point" style="left: 75%"></span>
-                  <span class="dificultad-point" style="left: 100%"></span>
-                </div>
-                <input
-                  aria-label="Selector de dificultad"
-                  id="selectorDificultad"
-                  max="4"
-                  min="0"
-                  step="1"
-                  type="range"
-                  value="2"
-                />
-              </div>
-            </div>
-            <p class="text-xs text-slate-400" id="textoDificultad">Modo normal activado.</p>
-            <div class="leyenda-dificultad grid gap-1 text-xs">
-              <p><span class="font-semibold">Principiante:</span> sin límite de vidas, ideal para practicar.</p>
-              <p><span class="font-semibold">Fácil:</span> más vidas y tiempo extendido para aprender.</p>
-              <p><span class="font-semibold">Normal:</span> equilibrio entre reto, tiempo y comodines.</p>
-              <p><span class="font-semibold">Difícil:</span> menos margen y preguntas extra avanzadas.</p>
-              <p><span class="font-semibold">Hardcore:</span> solo expertos, errores reinician la ronda.</p>
-            </div>
-          </div>
 
           <div
             class="theme-card anim-aparecer mt-6 rounded-3xl bg-slate-50/80 p-6 shadow-inner transition-colors duration-300"
@@ -533,7 +703,7 @@
             <span class="text-lg">✨</span>
             <p class="text-sm text-slate-600" id="textoFeedback">Elige un reto para iniciar.</p>
           </div>
-              <div class="mt-4 flex flex-wrap gap-2">
+              <div class="mt-4 flex flex-wrap gap-2" id="panelComodines">
                 <button
                   class="rounded-2xl border border-indigo-200 bg-white px-4 py-2 text-xs font-semibold text-indigo-600 shadow-sm transition hover:-translate-y-0.5 disabled:opacity-50"
                   id="comodinPista"
@@ -562,17 +732,11 @@
             </main>
       </section>
 
-      <section class="theme-panel animar-entrada rounded-3xl bg-white/90 p-6 shadow-xl transition-colors duration-300">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <h2 class="text-lg font-semibold text-slate-800">Categorías Disponibles</h2>
-          <p class="text-xs text-slate-400">
-            Explora mínimo 5 categorías con 20+ preguntas cada una.
-          </p>
-        </div>
+      <section class="hidden" id="seccionCategorias" aria-hidden="true">
         <div class="mt-4 grid gap-4 md:grid-cols-3" id="categorias"></div>
       </section>
 
-      <section class="theme-panel animar-entrada rounded-3xl bg-white/90 p-6 shadow-xl transition-colors duration-300">
+      <section class="theme-panel animar-entrada tarjeta-transicion rounded-3xl bg-white/90 p-6 shadow-xl transition-colors duration-300">
         <h2 class="text-lg font-semibold text-slate-800">Integrantes</h2>
         <div class="mt-4 grid gap-3 md:grid-cols-3">
           <div class="theme-card rounded-2xl bg-slate-50 p-4 shadow-inner">
@@ -590,6 +754,62 @@
         </div>
       </section>
     </div>
+
+    <div class="overlay-inicio" id="overlayInicio">
+      <div class="theme-panel w-full max-w-xl rounded-3xl bg-white/95 p-6 shadow-2xl">
+        <h2 class="text-2xl font-bold text-slate-900">Menú de inicio</h2>
+        <p class="mt-2 text-sm text-slate-500">Inicia una nueva partida o abre el gestor de partidas.</p>
+        <div class="mt-5 grid gap-3 sm:grid-cols-2">
+          <button class="rounded-2xl bg-gradient-to-r from-indigo-500 to-blue-500 px-4 py-3 text-sm font-semibold text-white" id="botonAbrirNuevaPartida">Nueva partida</button>
+          <button class="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow" id="botonAbrirGestor">Gestor de partidas</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay-inicio oculto" id="overlayNuevaPartida">
+      <div class="theme-panel w-full max-w-xl rounded-3xl bg-white/95 p-6 shadow-2xl">
+        <h3 class="text-xl font-bold text-slate-900">Configurar nueva partida</h3>
+        <div class="mt-4 space-y-3">
+          <input class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" id="inicioNombrePartida" placeholder="Nombre de partida" type="text"/>
+          <div class="rounded-2xl border border-slate-200 bg-white/90 p-3 tarjeta-transicion">
+            <label class="mb-2 block text-xs font-bold uppercase tracking-[0.2em] text-slate-500" for="inicioCategoria">Selector de categoría</label>
+            <select class="w-full rounded-xl border border-indigo-100 bg-gradient-to-r from-indigo-50 to-blue-50 px-3 py-3 text-sm font-semibold text-slate-700 shadow-sm focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200" id="inicioCategoria"></select>
+            <p class="mt-2 text-[11px] text-slate-500">Elige la categoría histórica para comenzar la partida.</p>
+          </div>
+          <label class="text-xs font-bold uppercase tracking-[0.2em] text-slate-600">Dificultad</label>
+          <div class="inicio-slider tarjeta-transicion">
+            <p class="inicio-dificultad-badge" id="inicioDificultadNombre">Normal</p>
+            <div class="inicio-dificultad-track">
+              <div class="inicio-dificultad-base">
+                <div class="inicio-dificultad-fill" id="inicioDificultadFill"></div>
+              </div>
+              <span class="inicio-dificultad-point" style="left: 0%"></span>
+              <span class="inicio-dificultad-point" style="left: 25%"></span>
+              <span class="inicio-dificultad-point" style="left: 50%"></span>
+              <span class="inicio-dificultad-point" style="left: 75%"></span>
+              <span class="inicio-dificultad-point" style="left: 100%"></span>
+              <input id="inicioDificultad" max="4" min="0" step="1" type="range" value="2" class="w-full"/>
+            </div>
+          </div>
+          <div class="dificultad-resumen" id="inicioDificultadResumen"></div>
+        </div>
+        <div class="mt-4 flex gap-3">
+          <button class="rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white" id="botonIniciarPartida">Iniciar partida</button>
+          <button class="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow" id="botonVolverInicio">Volver</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay-inicio oculto" id="overlayGestorPartidas">
+      <div class="theme-panel w-full max-w-3xl rounded-3xl bg-white/95 p-6 shadow-2xl">
+        <h3 class="text-xl font-bold text-slate-900">Gestor de partidas</h3>
+        <div class="mt-4 max-h-[55vh] overflow-y-auto space-y-3" id="listaGuardadosGestor"></div>
+        <div class="mt-4">
+          <button class="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow" id="botonCerrarGestor">Volver al inicio</button>
+        </div>
+      </div>
+    </div>
+
 
     <script>
       /*
@@ -1880,6 +2100,9 @@
           eliminar: 1,
         },
         permitirSalidaHasta: 0,
+        respuestasCorrectas: 0,
+        respuestasIncorrectas: 0,
+        partidaIniciada: false,
       };
 
       let contenedorCategorias;
@@ -1905,30 +2128,169 @@
       let textoDificultad;
       let burbujaDificultad;
       let rellenoDificultad;
+      let overlayInicio;
+      let overlayNuevaPartida;
+      let overlayGestorPartidas;
+      let inicioNombrePartida;
+      let inicioCategoria;
+      let inicioDificultad;
+      let listaGuardadosGestor;
+      let botonTerminarPartida;
+      let inicioDificultadNombre;
+      let inicioDificultadFill;
+      let inicioDificultadResumen;
+      let panelComodines;
+      let seguridadDesbloqueada = false;
+      let overlayActual = null;
+
+
+      function activarBloqueoSeguridad() {
+        if (seguridadDesbloqueada) {
+          return;
+        }
+        document.body.classList.add("bloqueo-seguridad");
+      }
+
+      function desactivarBloqueoSeguridadTemporal() {
+        seguridadDesbloqueada = true;
+        document.body.classList.remove("bloqueo-seguridad");
+      }
+
+      function restaurarBloqueoSeguridad() {
+        seguridadDesbloqueada = false;
+        document.body.classList.add("bloqueo-seguridad");
+      }
+
+      function bloquearEventosSeguridad(evento) {
+        if (seguridadDesbloqueada) {
+          return;
+        }
+        evento.preventDefault();
+      }
+
+      function animarOverlay(overlay, { direccion = 1, saliendo = false } = {}) {
+        if (!overlay || !window.gsap) {
+          return;
+        }
+        const panel = overlay.querySelector(".theme-panel");
+        if (saliendo) {
+          gsap.to(panel, {
+            x: -80 * direccion,
+            opacity: 0,
+            duration: 0.22,
+            ease: "power1.in",
+          });
+          return;
+        }
+        gsap.fromTo(panel, { x: 80 * direccion, opacity: 0 }, { x: 0, opacity: 1, duration: 0.32, ease: "power2.out" });
+      }
+
+      function obtenerDireccionTransicion(origen, destino) {
+        if (!origen || !destino || origen === destino) {
+          return 1;
+        }
+        if (origen === overlayInicio && (destino === overlayNuevaPartida || destino === overlayGestorPartidas)) {
+          return 1;
+        }
+        if ((origen === overlayNuevaPartida || origen === overlayGestorPartidas) && destino === overlayInicio) {
+          return -1;
+        }
+        if (origen === overlayNuevaPartida && destino === overlayGestorPartidas) {
+          return 1;
+        }
+        if (origen === overlayGestorPartidas && destino === overlayNuevaPartida) {
+          return -1;
+        }
+        return 1;
+      }
+
+      function mostrarSoloOverlay(overlayActivo) {
+        const direccion = obtenerDireccionTransicion(overlayActual, overlayActivo);
+        const anterior = overlayActual;
+        [overlayInicio, overlayNuevaPartida, overlayGestorPartidas].forEach((overlay) => {
+          if (overlay !== anterior && overlay !== overlayActivo) {
+            overlay.classList.add("oculto");
+          }
+        });
+        if (anterior && anterior !== overlayActivo && overlayActivo) {
+          animarOverlay(anterior, { direccion, saliendo: true });
+          setTimeout(() => {
+            if (overlayActual !== anterior) {
+              anterior.classList.add("oculto");
+            }
+          }, 220);
+        } else if (anterior && anterior !== overlayActivo) {
+          anterior.classList.add("oculto");
+        }
+        if (overlayActivo) {
+          overlayActivo.classList.remove("oculto");
+          animarOverlay(overlayActivo, { direccion });
+        }
+        overlayActual = overlayActivo;
+      }
+
+      function resetearTemaMenuInicio() {
+        document.body.dataset.theme = "normal";
+        if (inicioDificultad) {
+          inicioDificultad.value = "2";
+          actualizarSelectorInicioDificultad();
+        }
+      }
+
+      function volverAlMenuInicio(mensaje = "Volviste al menú de inicio.") {
+        estado.partidaIniciada = false;
+        estado.permitirSalidaHasta = 0;
+        detenerTemporizador();
+        detenerTemporizadorInvestigacion();
+        mostrarSoloOverlay(overlayInicio);
+        resetearTemaMenuInicio();
+        estadoGuardado.textContent = mensaje;
+      }
+
+      function iniciarPartidaDesdeMenu() {
+        const nivel = NIVELES_DIFICULTAD[Number(inicioDificultad.value)] ?? "normal";
+        actualizarSelectorInicioDificultad();
+        const categoriaSeleccionada = Number(inicioCategoria.value || 0);
+        aplicarDificultad(nivel);
+        estado.indiceCategoriaActual = categoriaSeleccionada;
+        estado.indicePreguntaActual = 0;
+        estado.vidas = estado.configuracion.vidasIniciales;
+        estado.puntaje = 0;
+        estado.respuestasCorrectas = 0;
+        estado.respuestasIncorrectas = 0;
+        estado.ordenPreguntas = obtenerOrdenAleatorio(obtenerTotalPreguntas(estado.categorias[estado.indiceCategoriaActual]));
+        estado.comodines = { ...estado.configuracion.comodines };
+        if (inicioNombrePartida.value.trim()) {
+          entradaNombre.value = inicioNombrePartida.value.trim();
+        }
+        estado.partidaIniciada = true;
+        mostrarSoloOverlay(null);
+        actualizarJuego();
+        estadoGuardado.textContent = "Nueva partida iniciada.";
+      }
+
+      function abrirGestorPartidas() {
+        renderizarGuardados();
+        mostrarSoloOverlay(overlayGestorPartidas);
+      }
 
       // Renderiza las tarjetas de categorías según el estado actual.
       function renderizarCategorias() {
         contenedorCategorias.innerHTML = "";
-        estado.categorias.forEach((categoria, indice) => {
-          const tarjeta = document.createElement("button");
+        estado.categorias.forEach((categoria) => {
+          const tarjeta = document.createElement("div");
           tarjeta.className =
-            "theme-card rounded-2xl bg-slate-50 p-4 text-left shadow-inner transition hover:-translate-y-1 hover:shadow-md";
+            "theme-card card-categoria tarjeta-transicion rounded-2xl bg-slate-50 p-4 text-left shadow-inner";
           tarjeta.innerHTML = `
             <p class="text-sm font-semibold text-slate-800">${categoria.nombre}</p>
             <p class="text-xs text-slate-400">${categoria.descripcion}</p>
             <p class="mt-2 text-xs text-indigo-500 font-semibold">${obtenerTotalPreguntas(categoria)} preguntas</p>
           `;
-          tarjeta.addEventListener("click", () => {
-            estado.indiceCategoriaActual = indice;
-            estado.indicePreguntaActual = 0;
-            estado.vidas = estado.configuracion.vidasIniciales;
-            estado.puntaje = 0;
-            estado.ordenPreguntas = obtenerOrdenAleatorio(obtenerTotalPreguntas(categoria));
-            actualizarJuego();
-            guardarPartida();
-          });
           contenedorCategorias.appendChild(tarjeta);
         });
+        if (window.gsap) {
+          gsap.fromTo("#categorias .card-categoria", { y: 12, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.05, duration: 0.35, ease: "power2.out" });
+        }
       }
 
       // Refresca estadísticas, categoría y nivel en pantalla.
@@ -2030,11 +2392,85 @@
         return etiquetas[nivel] ?? "Normal";
       }
 
+      function obtenerColorDificultad(nivel) {
+        const colores = {
+          principiante: "#f59e0b",
+          facil: "#22c55e",
+          normal: "#6366f1",
+          dificil: "#ef4444",
+          hardcore: "#000000",
+        };
+        return colores[nivel] ?? "#6366f1";
+      }
+
+
+      function renderizarResumenDificultad(nivel) {
+        if (!inicioDificultadResumen) {
+          return;
+        }
+        const cfg = obtenerConfiguracion(nivel);
+        const etiqueta = obtenerEtiquetaDificultad(nivel);
+        const totalComodines = Object.values(cfg.comodines).reduce((acc, v) => acc + v, 0);
+        const porcentajeEspecial = Math.round((cfg.probabilidadEspecial || 0) * 100);
+        const vidasTexto = cfg.vidasIniciales === 0 ? "Infinitas" : String(cfg.vidasIniciales);
+        const especial = cfg.tiempoEspecial > 0 ? `${cfg.tiempoEspecial}s` : "No aplica";
+        inicioDificultadResumen.classList.add("animando");
+        setTimeout(() => {
+          inicioDificultadResumen.innerHTML = `
+            <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-600">Resumen del modo ${etiqueta}</p>
+            <ul class="mt-2 space-y-1 text-xs text-slate-700">
+              <li>• Vidas iniciales: <span class="font-semibold">${vidasTexto}</span></li>
+              <li>• Tiempo por pregunta: <span class="font-semibold">${cfg.tiempoPregunta}s</span></li>
+              <li>• Preguntas especiales: <span class="font-semibold">${porcentajeEspecial}%</span> (${especial})</li>
+              <li>• Comodines totales: <span class="font-semibold">${totalComodines}</span> ${totalComodines === 0 ? "(desactivados)" : ""}</li>
+              <li>• Guardado: <span class="font-semibold">${cfg.puedeGuardar ? "Sí" : "No"}</span></li>
+              <li>• Anti-trampa: <span class="font-semibold">${cfg.antiTrampa ? "Activo" : "Inactivo"}</span></li>
+            </ul>
+          `;
+          inicioDificultadResumen.classList.remove("animando");
+        }, 120);
+      }
+
+      function actualizarSelectorInicioDificultad() {
+        if (!inicioDificultad || !inicioDificultadNombre) {
+          return;
+        }
+        const nivel = NIVELES_DIFICULTAD[Number(inicioDificultad.value)] ?? "normal";
+        const etiqueta = obtenerEtiquetaDificultad(nivel);
+        const color = obtenerColorDificultad(nivel);
+        const indice = NIVELES_DIFICULTAD.indexOf(nivel);
+        const porcentaje = indice <= 0 ? 0 : (indice / (NIVELES_DIFICULTAD.length - 1)) * 100;
+        inicioDificultadNombre.textContent = etiqueta;
+        inicioDificultadNombre.style.setProperty("--badge-color", color);
+        inicioDificultadNombre.style.color = nivel === "principiante" ? "#111827" : "#f8fafc";
+        if (inicioDificultadFill) {
+          const colorBarra = nivel === "hardcore" ? "#ffffff" : color;
+          inicioDificultadFill.style.width = `${porcentaje}%`;
+          inicioDificultadFill.style.backgroundColor = colorBarra;
+        }
+        inicioDificultad.style.accentColor = color;
+        inicioDificultad.style.setProperty("--slider-color", color);
+        document.body.dataset.theme = nivel;
+        renderizarResumenDificultad(nivel);
+      }
+
+      function mezclarArreglo(lista) {
+        const copia = [...lista];
+        for (let i = copia.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copia[i], copia[j]] = [copia[j], copia[i]];
+        }
+        return copia;
+      }
+
+
       // Sincroniza slider, burbuja y tema visual con la dificultad actual.
       function actualizarSliderDificultad(nivel) {
         const indice = NIVELES_DIFICULTAD.includes(nivel) ? NIVELES_DIFICULTAD.indexOf(nivel) : 2;
         const porcentaje = indice <= 0 ? 0 : (indice / (NIVELES_DIFICULTAD.length - 1)) * 100;
-        selectorDificultad.value = indice;
+        if (selectorDificultad) {
+          selectorDificultad.value = indice;
+        }
         if (rellenoDificultad) {
           rellenoDificultad.style.width = `${porcentaje}%`;
         }
@@ -2071,7 +2507,9 @@
         renderizarCategorias();
         actualizarComodines();
         actualizarEstado();
-        textoDificultad.textContent = `Modo ${obtenerEtiquetaDificultad(nivel)} activado.`;
+        if (textoDificultad) {
+          textoDificultad.textContent = `Modo ${obtenerEtiquetaDificultad(nivel)} activado.`;
+        }
       }
 
       // Genera la siguiente pregunta y pinta las opciones.
@@ -2092,7 +2530,8 @@
         }
         textoPregunta.textContent = pregunta.enunciado;
         contenedorOpciones.innerHTML = "";
-        pregunta.opciones.forEach((opcion) => {
+        const opcionesAleatorias = mezclarArreglo(pregunta.opciones);
+        opcionesAleatorias.forEach((opcion) => {
           const boton = document.createElement("button");
           boton.className =
             "rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:text-indigo-600";
@@ -2109,6 +2548,7 @@
         const esCorrecta = opcionSeleccionada === pregunta.respuesta;
         if (esCorrecta) {
           estado.puntaje += 10;
+          estado.respuestasCorrectas += 1;
           boton.classList.add("anim-correcto", "bg-emerald-100", "text-emerald-700");
           textoFeedback.textContent = `✅ ${pregunta.retroalimentacion}`;
           lanzarConfeti();
@@ -2117,6 +2557,7 @@
             textoFeedback.textContent += " ¡Pregunta especial! Ganaste una vida.";
           }
         } else {
+          estado.respuestasIncorrectas += 1;
           if (estado.configuracion.vidasIniciales > 0) {
             estado.vidas -= 1;
           }
@@ -2181,6 +2622,9 @@
           preguntaEspecial: estado.preguntaEspecial,
           comodines: estado.comodines,
           dificultad: estado.dificultad,
+          vidasDisponibles: estado.vidas,
+          respuestasCorrectas: estado.respuestasCorrectas,
+          respuestasIncorrectas: estado.respuestasIncorrectas,
         };
         localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(datos));
 
@@ -2226,6 +2670,8 @@
         estado.tiempoLimite = datos.tiempoLimite ?? 30;
         estado.preguntaEspecial = datos.preguntaEspecial ?? false;
         estado.comodines = datos.comodines ?? { pista: 1, saltar: 1, investigar: 1, eliminar: 1 };
+        estado.respuestasCorrectas = datos.respuestasCorrectas ?? 0;
+        estado.respuestasIncorrectas = datos.respuestasIncorrectas ?? 0;
         if (datos.dificultad) {
           aplicarDificultad(datos.dificultad, { reiniciar: false });
         }
@@ -2252,10 +2698,13 @@
         estado.tiempoLimite = registro.datos.tiempoLimite ?? 30;
         estado.preguntaEspecial = registro.datos.preguntaEspecial ?? false;
         estado.comodines = registro.datos.comodines ?? { pista: 1, saltar: 1, investigar: 1, eliminar: 1 };
+        estado.respuestasCorrectas = registro.datos.respuestasCorrectas ?? 0;
+        estado.respuestasIncorrectas = registro.datos.respuestasIncorrectas ?? 0;
         if (registro.datos.dificultad) {
           aplicarDificultad(registro.datos.dificultad, { reiniciar: false });
         }
         localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(registro.datos));
+        estado.partidaIniciada = true;
         estadoGuardado.textContent = `Partida cargada: ${registro.nombre}`;
         actualizarJuego();
       }
@@ -2275,6 +2724,9 @@
         }
         const guardados = obtenerGuardados();
         listaGuardados.innerHTML = "";
+        if (listaGuardadosGestor) {
+          listaGuardadosGestor.innerHTML = "";
+        }
         if (guardados.length === 0) {
           const vacio = document.createElement("p");
           vacio.className = "text-xs text-slate-400";
@@ -2286,11 +2738,13 @@
           const boton = document.createElement("button");
           boton.className =
             "theme-card rounded-xl border border-slate-200 bg-white/90 px-3 py-2 text-left text-xs font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5";
+          const correctas = registro.datos?.respuestasCorrectas ?? 0;
+          const incorrectas = registro.datos?.respuestasIncorrectas ?? 0;
           boton.innerHTML = `
             <div class="flex items-center justify-between gap-2">
               <div>
                 <span>${registro.nombre}</span>
-                <span class="block text-[10px] text-slate-400">${registro.fecha} · ${registro.dificultad ?? "Normal"}</span>
+                <span class="block text-[10px] text-slate-400">Última vez: ${registro.fecha} · ${registro.dificultad ?? "Normal"}</span>
               </div>
               <span class="rounded-full bg-indigo-100 px-2 py-1 text-[10px] font-semibold text-indigo-600">
                 Máx ${registro.maximoPuntaje}
@@ -2299,6 +2753,26 @@
           `;
           boton.addEventListener("click", () => cargarPartidaPorId(registro.id));
           listaGuardados.appendChild(boton);
+
+          if (listaGuardadosGestor) {
+            const tarjeta = document.createElement("article");
+            tarjeta.className = "theme-card rounded-2xl border border-slate-200 bg-white/90 p-4 text-sm";
+            tarjeta.innerHTML = `
+              <p class="font-semibold text-slate-800">${registro.nombre}</p>
+              <p class="text-xs text-slate-600">Última vez jugado: ${registro.fecha}</p>
+              <p class="text-xs text-slate-600">Dificultad: ${registro.dificultad ?? "Normal"}</p>
+              <p class="text-xs text-slate-600">Puntaje máximo: ${registro.maximoPuntaje}</p>
+              <p class="text-xs text-slate-600">Vidas disponibles: ${registro.datos?.vidas ?? 0}</p>
+              <p class="text-xs text-slate-600">Correctas: ${correctas} · Incorrectas: ${incorrectas}</p>
+              <button class="mt-3 rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white" data-id="${registro.id}">Continuar partida</button>
+            `;
+            tarjeta.querySelector("button")?.addEventListener("click", () => {
+              cargarPartidaPorId(registro.id);
+              estado.partidaIniciada = true;
+              mostrarSoloOverlay(null);
+            });
+            listaGuardadosGestor.appendChild(tarjeta);
+          }
         });
       }
 
@@ -2391,6 +2865,8 @@
         if (temporizadorInvestigar) {
           clearInterval(temporizadorInvestigar);
         }
+        desactivarBloqueoSeguridadTemporal();
+        estadoGuardado.textContent = "Seguridad desbloqueada por 10s.";
         actualizarComodines();
         temporizadorInvestigar = setInterval(() => {
           tiempoInvestigacionRestante -= 1;
@@ -2407,10 +2883,12 @@
           temporizadorInvestigar = null;
         }
         tiempoInvestigacionRestante = 0;
+        restaurarBloqueoSeguridad();
         actualizarComodines();
       }
 
       function perderPartida(mensaje) {
+        estado.partidaIniciada = false;
         textoPregunta.textContent = "Partida perdida.";
         contenedorOpciones.innerHTML = "";
         textoFeedback.textContent = `${mensaje} Debes empezar de cero.`;
@@ -2425,11 +2903,13 @@
         detenerTemporizadorInvestigacion();
         actualizarEstado();
         actualizarComodines();
+        resetearTemaMenuInicio();
         guardarPartida();
       }
 
       function perderPregunta(mensaje) {
         textoFeedback.textContent = `${mensaje} Pierdes la pregunta.`;
+        estado.respuestasIncorrectas += 1;
         if (estado.configuracion.vidasIniciales > 0) {
           estado.vidas = Math.max(0, estado.vidas - 1);
         }
@@ -2448,10 +2928,14 @@
 
       // Ajusta texto/estado de botones de comodines.
       function actualizarComodines() {
-        botonPista.disabled = estado.comodines.pista <= 0;
-        botonSaltar.disabled = estado.comodines.saltar <= 0;
-        botonInvestigar.disabled = estado.comodines.investigar <= 0;
-        botonEliminar.disabled = estado.comodines.eliminar <= 0;
+        if (panelComodines) {
+          panelComodines.classList.toggle("hidden", !estado.partidaIniciada);
+        }
+        const bloqueado = !estado.partidaIniciada;
+        botonPista.disabled = bloqueado || estado.comodines.pista <= 0;
+        botonSaltar.disabled = bloqueado || estado.comodines.saltar <= 0;
+        botonInvestigar.disabled = bloqueado || estado.comodines.investigar <= 0;
+        botonEliminar.disabled = bloqueado || estado.comodines.eliminar <= 0;
         botonPista.textContent = `Comodín: Pista (${estado.comodines.pista})`;
         botonSaltar.textContent = `Comodín: Saltar (${estado.comodines.saltar})`;
         const etiquetaInvestigar = tiempoInvestigacionRestante > 0 ? `${tiempoInvestigacionRestante}s` : "10s";
@@ -2460,6 +2944,9 @@
       }
 
       function usarComodinPista() {
+        if (!estado.partidaIniciada) {
+          return;
+        }
         if (!estado.comodines.pista) {
           return;
         }
@@ -2473,6 +2960,9 @@
       }
 
       function usarComodinSaltar() {
+        if (!estado.partidaIniciada) {
+          return;
+        }
         if (!estado.comodines.saltar) {
           return;
         }
@@ -2485,6 +2975,9 @@
 
       // Permite salir temporalmente de la pestaña sin penalización.
       function usarComodinInvestigar() {
+        if (!estado.partidaIniciada) {
+          return;
+        }
         if (!estado.comodines.investigar) {
           return;
         }
@@ -2497,6 +2990,9 @@
       }
 
       function usarComodinEliminar() {
+        if (!estado.partidaIniciada) {
+          return;
+        }
         if (!estado.comodines.eliminar || !estado.preguntaActual) {
           return;
         }
@@ -2537,22 +3033,8 @@
         document.querySelectorAll("[data-action]").forEach((boton) => {
           boton.addEventListener("click", () => {
             const accion = boton.dataset.action;
-            if (accion === "nuevo") {
-              estado.indicePreguntaActual = 0;
-              estado.vidas = estado.configuracion.vidasIniciales;
-              estado.puntaje = 0;
-              estado.ordenPreguntas = obtenerOrdenAleatorio(
-                obtenerTotalPreguntas(estado.categorias[estado.indiceCategoriaActual])
-              );
-              estado.comodines = { ...estado.configuracion.comodines };
-              actualizarJuego();
-              guardarPartida();
-              estadoGuardado.textContent = "Nueva partida iniciada.";
-            }
-            if (accion === "cargar") {
-              if (cargarPartida()) {
-                actualizarJuego();
-              }
+            if (accion === "terminar") {
+              volverAlMenuInicio("Partida terminada. Puedes iniciar otra desde el menú.");
             }
             if (accion === "guardar") {
               guardarPartida();
@@ -2585,11 +3067,26 @@
         textoDificultad = document.getElementById("textoDificultad");
         burbujaDificultad = document.getElementById("burbujaDificultad");
         rellenoDificultad = document.getElementById("rellenoDificultad");
+        overlayInicio = document.getElementById("overlayInicio");
+        overlayNuevaPartida = document.getElementById("overlayNuevaPartida");
+        overlayGestorPartidas = document.getElementById("overlayGestorPartidas");
+        inicioNombrePartida = document.getElementById("inicioNombrePartida");
+        inicioCategoria = document.getElementById("inicioCategoria");
+        inicioDificultad = document.getElementById("inicioDificultad");
+        inicioDificultadNombre = document.getElementById("inicioDificultadNombre");
+        inicioDificultadFill = document.getElementById("inicioDificultadFill");
+        inicioDificultadResumen = document.getElementById("inicioDificultadResumen");
+        listaGuardadosGestor = document.getElementById("listaGuardadosGestor");
+        botonTerminarPartida = document.getElementById("botonTerminarPartida");
+        panelComodines = document.getElementById("panelComodines");
 
         renderizarCategorias();
+        inicioCategoria.innerHTML = estado.categorias
+          .map((categoria, indice) => `<option value="${indice}">${categoria.nombre}</option>`)
+          .join("");
         enlazarMenu();
         estado.ordenPreguntas = obtenerOrdenAleatorio(obtenerTotalPreguntas(estado.categorias[0]));
-        aplicarDificultad(NIVELES_DIFICULTAD[Number(selectorDificultad.value)] ?? "normal");
+        aplicarDificultad("normal");
         actualizarJuego();
         renderizarGuardados();
         actualizarComodines();
@@ -2609,16 +3106,25 @@
         botonInvestigar.addEventListener("click", usarComodinInvestigar);
         botonEliminar.addEventListener("click", usarComodinEliminar);
         document.addEventListener("visibilitychange", gestionarSalidaVentana);
-        selectorDificultad.addEventListener("input", () => {
-          const nivel = NIVELES_DIFICULTAD[Number(selectorDificultad.value)] ?? "normal";
-          actualizarSliderDificultad(nivel);
-          textoDificultad.textContent = `Modo ${obtenerEtiquetaDificultad(nivel)} activado.`;
+
+        document.getElementById("botonAbrirNuevaPartida").addEventListener("click", () => mostrarSoloOverlay(overlayNuevaPartida));
+        document.getElementById("botonVolverInicio").addEventListener("click", () => mostrarSoloOverlay(overlayInicio));
+        document.getElementById("botonAbrirGestor").addEventListener("click", abrirGestorPartidas);
+        document.getElementById("botonCerrarGestor").addEventListener("click", () => mostrarSoloOverlay(overlayInicio));
+        document.getElementById("botonIniciarPartida").addEventListener("click", iniciarPartidaDesdeMenu);
+        inicioDificultad.addEventListener("input", actualizarSelectorInicioDificultad);
+        actualizarSelectorInicioDificultad();
+
+        ["contextmenu", "copy", "cut", "paste", "selectstart"].forEach((evento) => {
+          document.addEventListener(evento, bloquearEventosSeguridad);
         });
-        selectorDificultad.addEventListener("change", () => {
-          const nivel = NIVELES_DIFICULTAD[Number(selectorDificultad.value)] ?? "normal";
-          aplicarDificultad(nivel);
-          actualizarJuego();
+        document.addEventListener("keydown", (evento) => {
+          if (!seguridadDesbloqueada && (evento.ctrlKey || evento.metaKey) && ["c", "x", "v", "a"].includes(evento.key.toLowerCase())) {
+            evento.preventDefault();
+          }
         });
+        activarBloqueoSeguridad();
+        mostrarSoloOverlay(overlayInicio);
       });
     </script>
   </body>
