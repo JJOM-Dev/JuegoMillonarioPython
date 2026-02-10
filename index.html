@@ -2260,10 +2260,13 @@
         estado.respuestasIncorrectas = 0;
         estado.ordenPreguntas = obtenerOrdenAleatorio(obtenerTotalPreguntas(estado.categorias[estado.indiceCategoriaActual]));
         estado.comodines = { ...estado.configuracion.comodines };
+        estado.partidaIniciada = true;
+        if (panelComodines) {
+          panelComodines.classList.remove("hidden");
+        }
         if (inicioNombrePartida.value.trim()) {
           entradaNombre.value = inicioNombrePartida.value.trim();
         }
-        estado.partidaIniciada = true;
         mostrarSoloOverlay(null);
         actualizarJuego();
         estadoGuardado.textContent = "Nueva partida iniciada.";
@@ -2444,9 +2447,8 @@
         inicioDificultadNombre.style.setProperty("--badge-color", color);
         inicioDificultadNombre.style.color = nivel === "principiante" ? "#111827" : "#f8fafc";
         if (inicioDificultadFill) {
-          const colorBarra = nivel === "hardcore" ? "#ffffff" : color;
           inicioDificultadFill.style.width = `${porcentaje}%`;
-          inicioDificultadFill.style.backgroundColor = colorBarra;
+          inicioDificultadFill.style.backgroundColor = color;
         }
         inicioDificultad.style.accentColor = color;
         inicioDificultad.style.setProperty("--slider-color", color);
