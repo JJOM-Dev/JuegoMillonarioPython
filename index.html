@@ -22,6 +22,34 @@
         font-family: "Montserrat", sans-serif;
       }
 
+      body.bloqueo-seguridad {
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      body.bloqueo-seguridad input,
+      body.bloqueo-seguridad textarea,
+      body.bloqueo-seguridad [contenteditable="true"] {
+        user-select: text;
+        -webkit-user-select: text;
+      }
+
+      .overlay-inicio {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: rgba(15, 23, 42, 0.45);
+        backdrop-filter: blur(10px);
+        z-index: 50;
+      }
+
+      .overlay-inicio.oculto {
+        display: none;
+      }
+
       .anim-flotar {
         animation: flotar 3s ease-in-out infinite;
       }
@@ -410,19 +438,15 @@
         <aside class="theme-panel animar-entrada rounded-3xl bg-white/90 p-6 shadow-xl transition-colors duration-300">
           <h2 class="text-lg font-semibold text-slate-800">Menú Principal</h2>
           <div class="mt-4 flex flex-col gap-3">
+            <p class="text-xs text-slate-500">Partida activa</p>
             <button
               class="rounded-2xl bg-gradient-to-r from-indigo-500 to-blue-500 px-4 py-3 text-sm font-semibold text-white shadow-md transition hover:-translate-y-0.5 hover:from-indigo-400 hover:to-blue-400"
-              data-action="nuevo"
+              id="botonTerminarPartida"
+              data-action="terminar"
             >
-              Nueva partida
+              Terminar partida
             </button>
-            <button
-              class="rounded-2xl bg-white/80 px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5"
-              data-action="cargar"
-            >
-              Cargar partida
-            </button>
-            <div class="theme-card rounded-2xl bg-slate-50/80 p-3 shadow-inner">
+                        <div class="theme-card rounded-2xl bg-slate-50/80 p-3 shadow-inner" id="panelNombreGuardado">
               <label class="text-xs font-semibold text-slate-500" for="nombreGuardado">Nombre de la partida</label>
               <input
                 class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 focus:border-indigo-300 focus:outline-none"
@@ -482,7 +506,7 @@
               </div>
             </div>
           </div>
-          <div class="mt-4 flex flex-col gap-3">
+          <div class="mt-4 hidden flex-col gap-3" id="panelDificultadJuego">
             <div class="flex flex-wrap items-center gap-3">
               <label class="text-xs font-semibold text-slate-500" for="selectorDificultad">Dificultad</label>
               <div class="dificultad-slider">
@@ -590,6 +614,44 @@
         </div>
       </section>
     </div>
+
+    <div class="overlay-inicio" id="overlayInicio">
+      <div class="theme-panel w-full max-w-xl rounded-3xl bg-white/95 p-6 shadow-2xl">
+        <h2 class="text-2xl font-bold text-slate-900">Menú de inicio</h2>
+        <p class="mt-2 text-sm text-slate-500">Inicia una nueva partida o abre el gestor de partidas.</p>
+        <div class="mt-5 grid gap-3 sm:grid-cols-2">
+          <button class="rounded-2xl bg-gradient-to-r from-indigo-500 to-blue-500 px-4 py-3 text-sm font-semibold text-white" id="botonAbrirNuevaPartida">Nueva partida</button>
+          <button class="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow" id="botonAbrirGestor">Gestor de partidas</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay-inicio oculto" id="overlayNuevaPartida">
+      <div class="theme-panel w-full max-w-xl rounded-3xl bg-white/95 p-6 shadow-2xl">
+        <h3 class="text-xl font-bold text-slate-900">Configurar nueva partida</h3>
+        <div class="mt-4 space-y-3">
+          <input class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" id="inicioNombrePartida" placeholder="Nombre de partida" type="text"/>
+          <select class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" id="inicioCategoria"></select>
+          <label class="text-xs text-slate-500">Dificultad</label>
+          <input id="inicioDificultad" max="4" min="0" step="1" type="range" value="2" class="w-full"/>
+        </div>
+        <div class="mt-4 flex gap-3">
+          <button class="rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white" id="botonIniciarPartida">Iniciar partida</button>
+          <button class="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow" id="botonVolverInicio">Volver</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay-inicio oculto" id="overlayGestorPartidas">
+      <div class="theme-panel w-full max-w-3xl rounded-3xl bg-white/95 p-6 shadow-2xl">
+        <h3 class="text-xl font-bold text-slate-900">Gestor de partidas</h3>
+        <div class="mt-4 max-h-[55vh] overflow-y-auto space-y-3" id="listaGuardadosGestor"></div>
+        <div class="mt-4">
+          <button class="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow" id="botonCerrarGestor">Volver al inicio</button>
+        </div>
+      </div>
+    </div>
+
 
     <script>
       /*
@@ -1880,6 +1942,9 @@
           eliminar: 1,
         },
         permitirSalidaHasta: 0,
+        respuestasCorrectas: 0,
+        respuestasIncorrectas: 0,
+        partidaIniciada: false,
       };
 
       let contenedorCategorias;
@@ -1905,6 +1970,80 @@
       let textoDificultad;
       let burbujaDificultad;
       let rellenoDificultad;
+      let overlayInicio;
+      let overlayNuevaPartida;
+      let overlayGestorPartidas;
+      let inicioNombrePartida;
+      let inicioCategoria;
+      let inicioDificultad;
+      let listaGuardadosGestor;
+      let botonTerminarPartida;
+      let seguridadDesbloqueada = false;
+
+
+      function activarBloqueoSeguridad() {
+        if (seguridadDesbloqueada) {
+          return;
+        }
+        document.body.classList.add("bloqueo-seguridad");
+      }
+
+      function desactivarBloqueoSeguridadTemporal() {
+        seguridadDesbloqueada = true;
+        document.body.classList.remove("bloqueo-seguridad");
+      }
+
+      function restaurarBloqueoSeguridad() {
+        seguridadDesbloqueada = false;
+        document.body.classList.add("bloqueo-seguridad");
+      }
+
+      function bloquearEventosSeguridad(evento) {
+        if (seguridadDesbloqueada) {
+          return;
+        }
+        evento.preventDefault();
+      }
+
+      function mostrarSoloOverlay(overlayActivo) {
+        [overlayInicio, overlayNuevaPartida, overlayGestorPartidas].forEach((overlay) => {
+          overlay.classList.toggle("oculto", overlay !== overlayActivo);
+        });
+      }
+
+      function volverAlMenuInicio(mensaje = "Volviste al menú de inicio.") {
+        estado.partidaIniciada = false;
+        detenerTemporizador();
+        detenerTemporizadorInvestigacion();
+        mostrarSoloOverlay(overlayInicio);
+        estadoGuardado.textContent = mensaje;
+      }
+
+      function iniciarPartidaDesdeMenu() {
+        const nivel = NIVELES_DIFICULTAD[Number(inicioDificultad.value)] ?? "normal";
+        const categoriaSeleccionada = Number(inicioCategoria.value || 0);
+        aplicarDificultad(nivel);
+        estado.indiceCategoriaActual = categoriaSeleccionada;
+        estado.indicePreguntaActual = 0;
+        estado.vidas = estado.configuracion.vidasIniciales;
+        estado.puntaje = 0;
+        estado.respuestasCorrectas = 0;
+        estado.respuestasIncorrectas = 0;
+        estado.ordenPreguntas = obtenerOrdenAleatorio(obtenerTotalPreguntas(estado.categorias[estado.indiceCategoriaActual]));
+        estado.comodines = { ...estado.configuracion.comodines };
+        if (inicioNombrePartida.value.trim()) {
+          entradaNombre.value = inicioNombrePartida.value.trim();
+        }
+        estado.partidaIniciada = true;
+        mostrarSoloOverlay(null);
+        actualizarJuego();
+        estadoGuardado.textContent = "Nueva partida iniciada.";
+      }
+
+      function abrirGestorPartidas() {
+        renderizarGuardados();
+        mostrarSoloOverlay(overlayGestorPartidas);
+      }
 
       // Renderiza las tarjetas de categorías según el estado actual.
       function renderizarCategorias() {
@@ -2109,6 +2248,7 @@
         const esCorrecta = opcionSeleccionada === pregunta.respuesta;
         if (esCorrecta) {
           estado.puntaje += 10;
+          estado.respuestasCorrectas += 1;
           boton.classList.add("anim-correcto", "bg-emerald-100", "text-emerald-700");
           textoFeedback.textContent = `✅ ${pregunta.retroalimentacion}`;
           lanzarConfeti();
@@ -2117,6 +2257,7 @@
             textoFeedback.textContent += " ¡Pregunta especial! Ganaste una vida.";
           }
         } else {
+          estado.respuestasIncorrectas += 1;
           if (estado.configuracion.vidasIniciales > 0) {
             estado.vidas -= 1;
           }
@@ -2181,6 +2322,8 @@
           preguntaEspecial: estado.preguntaEspecial,
           comodines: estado.comodines,
           dificultad: estado.dificultad,
+          respuestasCorrectas: estado.respuestasCorrectas,
+          respuestasIncorrectas: estado.respuestasIncorrectas,
         };
         localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(datos));
 
@@ -2226,6 +2369,8 @@
         estado.tiempoLimite = datos.tiempoLimite ?? 30;
         estado.preguntaEspecial = datos.preguntaEspecial ?? false;
         estado.comodines = datos.comodines ?? { pista: 1, saltar: 1, investigar: 1, eliminar: 1 };
+        estado.respuestasCorrectas = datos.respuestasCorrectas ?? 0;
+        estado.respuestasIncorrectas = datos.respuestasIncorrectas ?? 0;
         if (datos.dificultad) {
           aplicarDificultad(datos.dificultad, { reiniciar: false });
         }
@@ -2252,6 +2397,8 @@
         estado.tiempoLimite = registro.datos.tiempoLimite ?? 30;
         estado.preguntaEspecial = registro.datos.preguntaEspecial ?? false;
         estado.comodines = registro.datos.comodines ?? { pista: 1, saltar: 1, investigar: 1, eliminar: 1 };
+        estado.respuestasCorrectas = registro.datos.respuestasCorrectas ?? 0;
+        estado.respuestasIncorrectas = registro.datos.respuestasIncorrectas ?? 0;
         if (registro.datos.dificultad) {
           aplicarDificultad(registro.datos.dificultad, { reiniciar: false });
         }
@@ -2275,6 +2422,9 @@
         }
         const guardados = obtenerGuardados();
         listaGuardados.innerHTML = "";
+        if (listaGuardadosGestor) {
+          listaGuardadosGestor.innerHTML = "";
+        }
         if (guardados.length === 0) {
           const vacio = document.createElement("p");
           vacio.className = "text-xs text-slate-400";
@@ -2286,6 +2436,8 @@
           const boton = document.createElement("button");
           boton.className =
             "theme-card rounded-xl border border-slate-200 bg-white/90 px-3 py-2 text-left text-xs font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5";
+          const correctas = registro.datos?.respuestasCorrectas ?? 0;
+          const incorrectas = registro.datos?.respuestasIncorrectas ?? 0;
           boton.innerHTML = `
             <div class="flex items-center justify-between gap-2">
               <div>
@@ -2299,6 +2451,25 @@
           `;
           boton.addEventListener("click", () => cargarPartidaPorId(registro.id));
           listaGuardados.appendChild(boton);
+
+          if (listaGuardadosGestor) {
+            const tarjeta = document.createElement("article");
+            tarjeta.className = "theme-card rounded-2xl border border-slate-200 bg-white/90 p-4 text-sm";
+            tarjeta.innerHTML = `
+              <p class="font-semibold text-slate-800">${registro.nombre}</p>
+              <p class="text-xs text-slate-500">${registro.fecha}</p>
+              <p class="mt-1 text-xs text-slate-600">Dificultad: ${registro.dificultad ?? "Normal"}</p>
+              <p class="text-xs text-slate-600">Puntaje máximo: ${registro.maximoPuntaje}</p>
+              <p class="text-xs text-slate-600">Correctas: ${correctas} · Incorrectas: ${incorrectas}</p>
+              <button class="mt-3 rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white" data-id="${registro.id}">Continuar partida</button>
+            `;
+            tarjeta.querySelector("button")?.addEventListener("click", () => {
+              cargarPartidaPorId(registro.id);
+              estado.partidaIniciada = true;
+              mostrarSoloOverlay(null);
+            });
+            listaGuardadosGestor.appendChild(tarjeta);
+          }
         });
       }
 
@@ -2391,6 +2562,8 @@
         if (temporizadorInvestigar) {
           clearInterval(temporizadorInvestigar);
         }
+        desactivarBloqueoSeguridadTemporal();
+        estadoGuardado.textContent = "Seguridad desbloqueada por 10s.";
         actualizarComodines();
         temporizadorInvestigar = setInterval(() => {
           tiempoInvestigacionRestante -= 1;
@@ -2407,6 +2580,7 @@
           temporizadorInvestigar = null;
         }
         tiempoInvestigacionRestante = 0;
+        restaurarBloqueoSeguridad();
         actualizarComodines();
       }
 
@@ -2430,6 +2604,7 @@
 
       function perderPregunta(mensaje) {
         textoFeedback.textContent = `${mensaje} Pierdes la pregunta.`;
+        estado.respuestasIncorrectas += 1;
         if (estado.configuracion.vidasIniciales > 0) {
           estado.vidas = Math.max(0, estado.vidas - 1);
         }
@@ -2537,22 +2712,8 @@
         document.querySelectorAll("[data-action]").forEach((boton) => {
           boton.addEventListener("click", () => {
             const accion = boton.dataset.action;
-            if (accion === "nuevo") {
-              estado.indicePreguntaActual = 0;
-              estado.vidas = estado.configuracion.vidasIniciales;
-              estado.puntaje = 0;
-              estado.ordenPreguntas = obtenerOrdenAleatorio(
-                obtenerTotalPreguntas(estado.categorias[estado.indiceCategoriaActual])
-              );
-              estado.comodines = { ...estado.configuracion.comodines };
-              actualizarJuego();
-              guardarPartida();
-              estadoGuardado.textContent = "Nueva partida iniciada.";
-            }
-            if (accion === "cargar") {
-              if (cargarPartida()) {
-                actualizarJuego();
-              }
+            if (accion === "terminar") {
+              volverAlMenuInicio("Partida terminada. Puedes iniciar otra desde el menú.");
             }
             if (accion === "guardar") {
               guardarPartida();
@@ -2585,8 +2746,19 @@
         textoDificultad = document.getElementById("textoDificultad");
         burbujaDificultad = document.getElementById("burbujaDificultad");
         rellenoDificultad = document.getElementById("rellenoDificultad");
+        overlayInicio = document.getElementById("overlayInicio");
+        overlayNuevaPartida = document.getElementById("overlayNuevaPartida");
+        overlayGestorPartidas = document.getElementById("overlayGestorPartidas");
+        inicioNombrePartida = document.getElementById("inicioNombrePartida");
+        inicioCategoria = document.getElementById("inicioCategoria");
+        inicioDificultad = document.getElementById("inicioDificultad");
+        listaGuardadosGestor = document.getElementById("listaGuardadosGestor");
+        botonTerminarPartida = document.getElementById("botonTerminarPartida");
 
         renderizarCategorias();
+        inicioCategoria.innerHTML = estado.categorias
+          .map((categoria, indice) => `<option value="${indice}">${categoria.nombre}</option>`)
+          .join("");
         enlazarMenu();
         estado.ordenPreguntas = obtenerOrdenAleatorio(obtenerTotalPreguntas(estado.categorias[0]));
         aplicarDificultad(NIVELES_DIFICULTAD[Number(selectorDificultad.value)] ?? "normal");
@@ -2619,6 +2791,23 @@
           aplicarDificultad(nivel);
           actualizarJuego();
         });
+
+        document.getElementById("botonAbrirNuevaPartida").addEventListener("click", () => mostrarSoloOverlay(overlayNuevaPartida));
+        document.getElementById("botonVolverInicio").addEventListener("click", () => mostrarSoloOverlay(overlayInicio));
+        document.getElementById("botonAbrirGestor").addEventListener("click", abrirGestorPartidas);
+        document.getElementById("botonCerrarGestor").addEventListener("click", () => mostrarSoloOverlay(overlayInicio));
+        document.getElementById("botonIniciarPartida").addEventListener("click", iniciarPartidaDesdeMenu);
+
+        ["contextmenu", "copy", "cut", "paste", "selectstart"].forEach((evento) => {
+          document.addEventListener(evento, bloquearEventosSeguridad);
+        });
+        document.addEventListener("keydown", (evento) => {
+          if (!seguridadDesbloqueada && (evento.ctrlKey || evento.metaKey) && ["c", "x", "v", "a"].includes(evento.key.toLowerCase())) {
+            evento.preventDefault();
+          }
+        });
+        activarBloqueoSeguridad();
+        mostrarSoloOverlay(overlayInicio);
       });
     </script>
   </body>

@@ -1081,6 +1081,12 @@ class AplicacionJuego:
         self._perder_pregunta("Se acabó el tiempo.")
 
     def _perder_partida(self, mensaje: str) -> None:
+        self._detener_temporizador_investigar()
+        self._detener_temporizador()
+        reiniciar = messagebox.askyesno(
+            "Partida perdida",
+            f"{mensaje}\n\nHas perdido y debes empezar de cero.\n\n¿Deseas iniciar una nueva partida ahora?",
+        )
         self.vidas = 0
         self.puntaje = 0
         self.indice_pregunta = 0
@@ -1089,11 +1095,11 @@ class AplicacionJuego:
         self.vidas = self.configuracion["vidas_iniciales"]
         self.comodines = self.configuracion["comodines"].copy()
         self.retroalimentacion.config(text=f"{mensaje} Debes empezar de cero.")
-        self._detener_temporizador_investigar()
         self._actualizar_comodines()
-        self._detener_temporizador()
         self._guardar_automatico()
         self._actualizar_panel()
+        if reiniciar:
+            self.nueva_partida()
 
     def _perder_pregunta(self, mensaje: str) -> None:
         self.retroalimentacion.config(text=f"{mensaje} Pierdes la pregunta.")
